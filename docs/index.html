@@ -1,65 +1,100 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>食品法規適用性儀表板</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;background:#f3f5f2;color:#162019;display:grid;place-items:center;min-height:100vh}main{max-width:760px;padding:32px;text-align:center}h1{font-size:30px}p{color:#667269}#err{color:#9b3434;white-space:pre-wrap}</style></head><body><main><h1>食品法規適用性儀表板</h1><p id="msg">正在載入儀表板…</p><p id="err"></p></main><script>(async()=>{try{
-const files=['part00.txt','part01.txt','part02.txt','part03.txt','part04.txt','part05.txt'];const parts=await Promise.all(files.map(async f=>{const r=await fetch('data/'+f+'?v=20260823-1855',{cache:'no-store'});if(!r.ok)throw new Error(f+' 載入失敗：HTTP '+r.status);return (await r.text()).trim()}));const b64=parts.join('');if(b64.length!==20904)throw new Error('資料長度異常：'+b64.length+' / 20904');const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));if(typeof DecompressionStream==='undefined')throw new Error('瀏覽器不支援 DecompressionStream，請使用最新版 Chrome、Edge 或 Safari');const ds=new DecompressionStream('gzip');let html=await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();
-function tx(name,fn){const m='const '+name+' = ',s=html.indexOf(m);if(s<0)throw new Error('找不到 '+name);const a=s+m.length;let d=0,q=0,e=0,z=-1;for(let i=a;i<html.length;i++){const c=html[i];if(q){if(e)e=0;else if(c==='\\')e=1;else if(c==='"')q=0}else if(c==='"')q=1;else if(c==='[')d++;else if(c===']'&&!--d){z=i+1;break}}if(z<0)throw new Error(name+' 格式異常');html=html.slice(0,a)+JSON.stringify(fn(JSON.parse(html.slice(a,z))))+html.slice(z)}
-const P='https://www.fda.gov.tw/tc/newscontent.aspx?cid=3&id=27328',T='https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=30519';
-const pn='最低保險金額：每一個人身體傷害100萬元；每一意外事故身體傷害400萬元；每一意外事故財物損失0元；保險期間累計1000萬元。產品屬委託製造、加工或調配者，原則由委託者優先投保。';
-const pli=[[20001,'製造','食品或食品添加物製造業','具有商業登記或公司登記者','2013-08-05'],[20002,'製造','食品或食品添加物製造業','具有工廠登記，但未有公司登記或商業登記者','2017-07-01'],[20003,'製造','食品或食品添加物製造業','具有稅籍登記或農產品初級加工場登記者','2022-01-01'],[20004,'輸入','食品或食品添加物輸入業','具有商業登記或公司登記者','2013-08-05'],[20005,'輸入','食品或食品添加物輸入業','具有工廠登記，但未有公司登記或商業登記者','2017-07-01'],[20006,'輸入','食品或食品添加物輸入業','具有稅籍登記者','2022-01-01'],[20007,'餐飲','餐飲業','具有商業登記或公司登記者','2013-08-05'],[20008,'餐飲','餐飲業','具有工廠登記，但未有公司登記或商業登記者','2017-07-01']].map(x=>({id:x[0],area:x[1],category:x[2],scale:x[3],start:x[4],note:pn,module:'產品責任險',status:'已實施',sourceName:'食品業者投保產品責任保險',sourceUrl:P,basis:'食安法第13條'}));
-const tn='本列為「應建立食品追溯追蹤系統」之適用門檻；電子申報至非追不可及使用電子發票，另依公告第3、4點之規模與實施日期辦理。';
-const tr=[[21001,'製造','食用油脂','辦有工廠登記者','2014-10-31'],[21002,'製造','肉類加工食品、乳品加工食品（市售包裝乳粉及調製乳粉除外）、水產品食品','辦有工廠登記，且屬公告應符合HACCP之該類食品業者','2015-02-05'],[21003,'製造','餐盒食品','辦有工廠登記者','2015-02-05'],[21004,'製造','食品添加物','辦有商業登記、公司登記或工廠登記者','2015-02-05'],[21005,'製造','黃豆、小麥、玉米、麵粉、澱粉、食鹽、糖、包裝茶葉飲料、黃豆製品','辦有工廠登記且資本額 ≥ 3,000萬元','2015-07-31'],[21006,'製造','嬰兒與較大嬰兒配方食品','辦有工廠登記者（現行已不分資本額）','2016-07-01'],[21007,'製造','市售包裝乳粉及調製乳粉','辦有工廠登記者','2015-02-05'],[21008,'製造','蛋製品、食用醋','辦有工廠登記且資本額 ≥ 3,000萬元','2017-07-31'],[21009,'製造','其他食品業別','辦有工廠登記且資本額 ≥ 3,000萬元','2019-01-01'],[21010,'輸入','食用油脂','辦有商業登記、公司登記或工廠登記者','2014-10-31'],[21011,'輸入','肉類加工食品、乳品加工食品、水產品食品、食品添加物、基因改造食品原料、市售包裝乳粉及調製乳粉','辦有商業登記、公司登記或工廠登記者','2015-02-05'],[21012,'輸入','黃豆、麥類及燕麥、玉米、麵粉、澱粉、食鹽、糖、茶葉、黃豆製品','辦有商業登記、公司登記或工廠登記者','2015-07-31'],[21013,'輸入','嬰兒與較大嬰兒配方食品','辦有商業登記、公司登記或工廠登記者','2016-01-01'],[21014,'輸入','嬰幼兒食品','辦有商業登記、公司登記或工廠登記者','2017-07-31'],[21015,'輸入','農產植物製品、菇（蕈）類及藻類之冷凍／冷藏／脫水／醃漬／凝膠及餡料製品、植物蛋白及其製品','辦有商業登記、公司登記或工廠登記者','2019-01-01'],[21016,'輸入','殼蛋','辦有商業登記、公司登記、工廠登記或稅籍登記者','2024-07-01'],[21017,'販售','嬰兒與較大嬰兒配方食品、市售包裝乳粉及調製乳粉','辦有商業登記、公司登記或工廠登記，且資本額 ≥ 3,000萬元','2017-01-01'],[21018,'販售','餐盒食品','達3家以上非百貨公司之綜合商品零售業獨立門市之連鎖品牌，且資本額 ≥ 3,000萬元','2019-01-01']].map(x=>({id:x[0],area:x[1],category:x[2],scale:x[3],start:x[4],note:tn,module:'食品追溯追蹤',status:'已實施',sourceName:'113/4/25 應建立食品追溯追蹤系統之食品業者',sourceUrl:T,basis:'食安法第9條第2項至第4項'}));
-const mon=[[11001,'食品工廠；資本額 ≥ 3,000萬元','既有納管','現行已納管。'],[11002,'食品工廠；資本額 2,000萬元以上未達3,000萬元，且食品從業人員 ≥ 5人','2026-01-01','115/1/1起已納入現行規定。'],[11003,'僅辦理商業登記、公司登記、稅籍登記或取得農產品初級加工場登記，且資本額 ≥ 3,000萬元','2026-01-01','115/1/1起已納入現行規定。']].map(x=>({id:x[0],scale:x[1],start:x[2],note:x[3],module:'食品安全監測計畫',area:'製造',category:'一般食品、食品添加物（非特殊營養食品）',status:'已實施',sourceName:'114/10/8 修正規定－附表一',sourceUrl:'https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=31232',basis:'食安法第7條第4項'}));
-function norm(r){r={...r};if(r.area==='製造／加工／調配'||r.area==='製造／加工')r.area='製造';if(r.module==='應置技術證照人員'&&r.category==='前店後廠小型烘焙業')r.area='餐飲';return r}function app(a,b){const s=new Set(a.map(x=>x.id));b.forEach(x=>{if(!s.has(x.id))a.push(x)});return a}
-tx('RULES',a=>app(app(a.filter(r=>r.module!=='食品業者登錄').map(norm),pli),tr));
-tx('CURRENT_RULES',a=>{a=a.filter(r=>r.module!=='食品業者登錄'&&r.id!==10001).map(norm).map(r=>{r={...r};if(r.module==='食品安全管制系統 HACCP'&&r.category==='熱殺菌密閉容器包裝低酸性食品及酸化食品工廠')r.note='2026/3/17修正名稱及適用範圍。';if(r.module==='食品安全管制系統 HACCP'&&(r.category==='食用油脂工廠'||r.category==='蛋製品工廠')){r.start='2020-07-01';r.note=''}if(r.module==='食品安全管制系統 HACCP'&&r.category==='餐盒食品工廠'){r.scale='須辦理工廠登記之餐盒食品工廠';r.start='2010-09-15';r.note=''}if(r.module==='食品安全管制系統 HACCP'&&r.category==='國際觀光旅館／五星級旅館附設餐廳'){r.start='2018-07-01';r.note=''}if(r.module==='應置衛生管理人員'&&r.category==='其他食品製造業'){r.start='2020-07-01';r.note=''}if(r.module==='應置專門職業人員'&&r.id>=10010&&r.id<=10017){r.start='2020-01-01';r.note=''}r.start=String(r.start||'').replace(/ 起完整現行範圍| 起現行範圍| 起兩類均已納管| 起全面納管/g,'');return r});const i=a.findIndex(r=>r.module==='食品安全監測計畫'&&r.category==='取得特殊營養食品查驗登記許可');a.splice(i<0?0:i+1,0,...mon);const ctr=tr.map(r=>r.id===21006?{...r,scale:'辦有工廠登記者'}:r);return app(app(a,pli),ctr)});
-tx('SOURCES',a=>{if(!a.some(s=>s.name==='食品業者投保產品責任保險'))a.push({name:'食品業者投保產品責任保險',url:P,desc:'現行投保對象、登記規模、最低保險金額及施行日期。'});if(!a.some(s=>s.name==='113/4/25 食品追溯追蹤公告'))a.push({name:'113/4/25 食品追溯追蹤公告',url:T,desc:'現行應建立追溯追蹤系統之業者類別、規模與實施日期。'});return a});
-html=html.replace('以「業態 × 產品／業別 × 規模 × 實施日期」查詢目前適用的食品法規義務。資料以食藥署正式公告與現行 Q&A 為基礎，最近校對日：2026-08-23。','最後校正日期：2026-08-23').replaceAll('現行整併規定','現行規定').replace('依「現行整併／歷次分階段」模式切換','依「現行規定／歷史沿革／未來實施」模式切換').replace('歷次／分階段模式可查看尚未生效門檻','切換「未來實施」可查看尚未生效門檻').replace('需要追溯實施期程時，可切換至歷次／分階段。','需要追溯過去期程時切換「歷史沿革」；查看已公告但尚未生效規定時切換「未來實施」。').replace('<option value="current">現行規定</option><option value="history">歷次／分階段（含未來已公告）</option>','<option value="current">現行規定</option><option value="history">歷史沿革</option><option value="future">未來實施</option>');
-html=html.replace("const areas=[...new Set(RULES.map(r=>r.area))].sort();","const areas=[...new Set(RULES.flatMap(r=>r.area==='餐飲／製造'?['餐飲','製造']:[r.area]))].sort();").replace("&&(!a||r.area===a)&&","&&(!a||r.area===a||(r.area==='餐飲／製造'&&(a==='餐飲'||a==='製造')))&&");
-html=html.replace("const chips=['食品安全監測計畫','強制檢驗','食品安全管制系統 HACCP','應自設實驗室','應置衛生管理人員','應置專門職業人員'];","const chips=['食品安全監測計畫','強制檢驗','食品安全管制系統 HACCP','應自設實驗室','應置衛生管理人員','應置專門職業人員','應置技術證照人員','產品責任險','食品追溯追蹤'];");
-html=html.replace("return $('#viewMode').value==='history' ? RULES : CURRENT_RULES;","const mode=$('#viewMode').value;if(mode==='history')return RULES.filter(r=>r.status!=='未來實施');if(mode==='future')return RULES.filter(r=>r.status==='未來實施');return CURRENT_RULES;").replace("$('#modeBadge').textContent=$('#viewMode').value==='history'?'● 歷次／分階段規定':'● 現行規定';","const mode=$('#viewMode').value;$('#modeBadge').textContent=mode==='history'?'● 歷史沿革':mode==='future'?'● 未來實施':'● 現行規定';").replace("if(id==='viewMode'&&$('#viewMode').value==='current'&&$('#status').value==='未來實施')$('#status').value='';","if(id==='viewMode'){$('#status').value='';}");
-html=html.replace('<button class="btn primary" id="printBtn">列印／存成 PDF</button>','').replace("$('#printBtn').addEventListener('click',()=>window.print());",'');
-html=html.replace('</style>',`
-.grid4{display:none!important}
-.module-catalog-summary{font-size:15px;color:var(--muted);margin:4px 0 14px}
-.module-catalog-list{display:grid;grid-template-columns:1fr;gap:9px}
-.module-catalog-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);cursor:pointer;text-align:left;width:100%;color:var(--text)}
-.module-catalog-item:hover{background:var(--green2);border-color:#bfd4c5}
-.module-catalog-name{font-weight:800}
-.module-catalog-count{font-size:12px;color:var(--muted);white-space:nowrap}
-</style>`);
-html=html.replace('<button class="btn ghost" id="sourcesBtn">資料來源</button>','<button class="btn ghost" id="modulesBtn">已納入法規</button><button class="btn ghost" id="sourcesBtn">資料來源</button>');
-html=html.replace('<div class="source-modal" id="sourceModal" aria-hidden="true">',`<div class="source-modal" id="modulesModal" aria-hidden="true">
-  <div class="source-modal-backdrop" data-close-modules></div>
-  <div class="source-modal-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
-    <div class="source-modal-head">
-      <div>
-        <div class="small">本儀表板目前收錄範圍</div>
-        <h2 id="modulesModalTitle">已納入法規</h2>
-      </div>
-      <button class="btn" type="button" id="modulesCloseBtn" aria-label="關閉已納入法規">關閉</button>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>食品法規適用性儀表板</title>
+<link rel="stylesheet" href="css/style.css?v=20260823-refactor1">
+</head>
+<body>
+<div class="shell">
+<section class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="eyebrow">FOOD REGULATORY COMPLIANCE DASHBOARD</div>
+      <h1>食品法規適用性儀表板</h1>
+      <p>最後校正日期：<span id="lastReviewed">2026-08-23</span></p>
     </div>
-    <div class="module-catalog-summary" id="modulesSummary"></div>
-    <div class="module-catalog-list" id="modulesList"></div>
+    <span class="badge" id="modeBadge">● 現行規定</span>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" id="csvBtn">匯出目前查詢 CSV</button>
+    <button class="btn ghost" id="jumpBtn">進入法規查詢</button>
+    <button class="btn ghost" id="modulesBtn">已納入法規</button>
+    <button class="btn ghost" id="sourcesBtn">資料來源</button>
+  </div>
+</section>
+
+<section class="section" id="querySection">
+  <div class="section-head"><div><h2>法規查詢</h2><div class="small">預設顯示截至目前已生效且整併後的現行適用範圍；需要追溯過去期程時切換「歷史沿革」；查看已公告但尚未生效規定時切換「未來實施」</div></div><div class="search-count" id="count"></div></div>
+  <div class="card filters">
+    <div class="filtergrid">
+      <label><span>顯示方式</span><select id="viewMode"><option value="current">現行規定</option><option value="history">歷史沿革</option><option value="future">未來實施</option></select></label>
+      <label><span>關鍵字</span><input id="q" type="search" placeholder="輸入業別、產品、規模或法規"></label>
+      <label><span>法規模組</span><select id="module"><option value="">全部模組</option></select></label>
+      <label><span>業態</span><select id="area"><option value="">全部業態</option></select></label>
+      <label><span>狀態</span><select id="status"><option value="">全部狀態</option><option>已實施</option><option>未來實施</option></select></label>
+    </div>
+    <div class="toolbar">
+      <div class="chips" id="quickChips"></div>
+      <button class="btn" id="resetBtn" type="button">清除篩選</button>
+    </div>
+  </div>
+</section>
+
+<section class="section two">
+  <div class="card table-card">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>法規模組</th><th>業態</th><th>產品／業別</th><th>規模／條件</th><th>實施日</th><th>狀態</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="6" style="padding:32px;text-align:center;color:#667269">正在載入法規資料…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="card detail">
+    <div class="small">規則詳細資料</div>
+    <div id="detailEmpty" class="detail-empty">請點選左側任一規則查看法源與判讀備註</div>
+    <div id="detailBox" hidden>
+      <h3 id="dTitle"></h3>
+      <div style="margin-top:8px"><span class="status" id="dStatus"></span></div>
+      <div class="kv">
+        <div class="k">法規模組</div><div id="dModule"></div>
+        <div class="k">業態</div><div id="dArea"></div>
+        <div class="k">規模條件</div><div id="dScale"></div>
+        <div class="k">實施日期</div><div id="dStart"></div>
+        <div class="k">法源</div><div id="dBasis"></div>
+        <div class="k">判讀備註</div><div id="dNote"></div>
+        <div class="k">官方來源</div><div><a id="dSource" target="_blank" rel="noopener"></a></div>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<div class="module-modal" id="modulesModal" aria-hidden="true">
+  <div class="module-modal-backdrop" data-close-modules></div>
+  <div class="module-modal-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
+    <div class="module-modal-head"><div><div class="small">目前資料庫收錄範圍</div><h2 id="modulesModalTitle">已納入法規</h2></div><button class="btn" type="button" id="modulesCloseBtn">關閉</button></div>
+    <p class="small">目前共納入 <strong id="moduleCount">0</strong> 個法規模組。點選模組可直接套用查詢條件</p>
+    <div class="module-catalog" id="moduleCatalog"></div>
   </div>
 </div>
 
-<div class="source-modal" id="sourceModal" aria-hidden="true">`);
-html=html.replace('</body>',`<script>
-(()=>{
-  const btn=document.getElementById('modulesBtn'), modal=document.getElementById('modulesModal');
-  if(!btn||!modal)return;
-  const data=(typeof CURRENT_RULES!=='undefined'?CURRENT_RULES:[]);
-  const modules=[...new Set(data.map(r=>r.module))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
-  const summary=document.getElementById('modulesSummary'), list=document.getElementById('modulesList');
-  summary.textContent='目前納入 '+modules.length+' 個法規模組';
-  list.innerHTML=modules.map(m=>{
-    const n=data.filter(r=>r.module===m).length;
-    return '<button type="button" class="module-catalog-item" data-module="'+m.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"><span class="module-catalog-name">'+m.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span><span class="module-catalog-count">'+n+' 筆現行規則</span></button>';
-  }).join('');
-  const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'};
-  const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow=''};
-  btn.addEventListener('click',open);document.getElementById('modulesCloseBtn').addEventListener('click',close);
-  modal.querySelectorAll('[data-close-modules]').forEach(el=>el.addEventListener('click',close));
-  list.addEventListener('click',e=>{const item=e.target.closest('[data-module]');if(!item)return;const sel=document.getElementById('module');if(sel){sel.value=item.dataset.module;close();document.getElementById('querySection')?.scrollIntoView({behavior:'smooth'});if(typeof render==='function')render()}});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()});
-})();
-<\/script></body>`);
-document.open();document.write(html);document.close()}catch(e){document.getElementById('msg').textContent='頁面載入失敗';document.getElementById('err').textContent=String(e)}})();</script></body></html>
+<div class="source-modal" id="sourceModal" aria-hidden="true">
+  <div class="source-modal-backdrop" data-close-sources></div>
+  <div class="source-modal-panel" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
+    <div class="source-modal-head"><div><div class="small">法規查核與更新</div><h2 id="sourceModalTitle">資料來源</h2></div><button class="btn" type="button" id="sourcesCloseBtn">關閉</button></div>
+    <p class="small" style="margin:4px 0 14px">集中收錄本儀表板使用的食藥署正式公告、現行 Q&A 與法規入口</p>
+    <div class="sources" id="sources"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>本網站為法規管理與初步適用性判讀工具，不取代主管機關正式解釋、個案法律意見或最新法規原文。若業者同時具多種業態、委外製造、兼營輸入或產品分類有疑義，應回到各公告附表及 Q&amp;A 逐項確認</div>
+  <div style="margin-top:6px">資料版本：<span id="dataVersion">2026-08-23</span></div>
+</div>
+</div>
+<script src="js/app.js?v=20260823-refactor1" defer></script>
+</body>
+</html>
