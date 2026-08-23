@@ -1,0 +1,97 @@
+@media (max-width:720px){
+  html,body{overflow-x:hidden}
+  body{font-size:14px}
+  .app-shell{padding:0;max-width:none}
+
+  .topbar{min-height:0;padding:14px 16px 0;gap:12px;box-shadow:none;border-bottom:3px solid var(--orange)}
+  .brand-block{width:100%}
+  .brand-block h1{font-size:20px;line-height:1.25}
+  .reviewed{font-size:11px;margin-top:4px}
+  .top-actions{width:calc(100% + 32px);margin:0 -16px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid rgba(255,255,255,.16)}
+  .top-link{min-height:44px;padding:10px 4px;border:0;border-right:1px solid rgba(255,255,255,.14);font-size:12px;text-align:center}
+  .top-link:last-child{border-right:0}
+
+  .main-content{gap:10px;padding:10px 8px 0}
+  .panel{box-shadow:none}
+  .query-panel{padding:14px 12px 12px;border-top-width:3px}
+  .panel-title{font-size:17px;margin-bottom:12px}
+  .query-grid{grid-template-columns:1fr;gap:11px}
+  .field>span,.field legend{font-size:12px;margin-bottom:5px}
+  .field input:not([type="radio"]),.field select{min-height:46px;font-size:16px;padding:10px 11px}
+
+  .mode-options{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0;min-height:44px;border-color:var(--border-strong)}
+  .mode-options label{position:relative;min-height:43px;padding:0 4px;border:0;border-right:1px solid var(--border);font-size:12px;font-weight:750;background:#fff;color:#496077}
+  .mode-options label:last-child{border-right:0}
+  .mode-options label:has(input:checked){background:var(--blue-dark);color:#fff;box-shadow:inset 0 -3px 0 var(--orange)}
+  .mode-options input[type="radio"]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+  .mode-options label:focus-within{outline:2px solid rgba(30,79,122,.28);outline-offset:-2px}
+
+  .query-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .query-actions .btn{width:100%;min-height:44px;font-size:14px}
+
+  .module-panel{padding:10px 0 11px;border-top-width:2px;overflow:hidden}
+  .module-panel .panel-title{padding:0 12px;margin-bottom:8px;font-size:16px}
+  .module-tabs{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding:0 12px 3px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .module-tabs::-webkit-scrollbar{display:none}
+  .module-tab{flex:0 0 auto;min-height:38px;padding:8px 12px;font-size:12px;scroll-snap-align:start}
+
+  .content-grid{display:block}
+  .results-panel{overflow:visible}
+  .results-head{min-height:0;padding:12px;align-items:center;background:#fff}
+  .results-head h2{font-size:17px;line-height:1.3}
+  .result-count{display:block;font-size:12px;margin-top:2px}
+  .export-btn{min-height:38px;padding:7px 9px;font-size:11px;white-space:nowrap}
+
+  .tablewrap{overflow:visible;min-height:0;max-height:none;padding:0;background:var(--bg)}
+  table{display:block;min-width:0;width:100%;font-size:13px}
+  thead{display:none}
+  tbody{display:grid;gap:9px;padding:9px 8px 10px}
+  tbody tr{display:block;border:1px solid var(--border-strong);background:#fff;padding:11px 12px;box-shadow:0 1px 3px rgba(20,49,76,.04)}
+  tbody tr:hover{background:#fff}
+  tbody tr.selected{background:var(--blue-pale);box-shadow:inset 4px 0 0 var(--blue)}
+  tbody td{display:grid;grid-template-columns:76px minmax(0,1fr);gap:9px;padding:4px 0;border:0;line-height:1.45;overflow-wrap:anywhere}
+  tbody td::before{font-size:11px;font-weight:800;color:var(--muted);line-height:1.45}
+  tbody td:nth-child(1)::before{content:"法規模組"}
+  tbody td:nth-child(2)::before{content:"業態"}
+  tbody td:nth-child(3)::before{content:"產品／業別"}
+  tbody td:nth-child(4)::before{content:"規模／條件"}
+  tbody td:nth-child(5)::before{content:"實施日期"}
+  tbody td:nth-child(6)::before{content:"狀態"}
+  tbody td.module-cell{font-size:14px;color:var(--blue-dark);padding-bottom:7px;margin-bottom:3px;border-bottom:1px solid #e8edf2}
+  .status{justify-self:start;padding:3px 7px;font-size:11px}
+  .loading-cell,.empty-cell{display:block!important;padding:28px 12px!important;text-align:center!important;border:1px solid var(--border);background:#fff}
+  .loading-cell::before,.empty-cell::before{display:none}
+
+  .pagination-bar{padding:10px 8px 12px;display:grid;grid-template-columns:auto 1fr;gap:9px;background:#fff}
+  .page-size{font-size:11px;white-space:nowrap}
+  .page-size select{min-height:38px;font-size:16px}
+  .page-info{margin:0;justify-self:end;align-self:center;font-size:11px}
+  .pager{grid-column:1/-1;width:100%;display:flex;justify-content:center;gap:5px;overflow-x:auto;padding-bottom:1px}
+  .page-btn{min-width:40px;height:40px;font-size:14px;flex:0 0 auto}
+
+  .detail-panel{position:static;margin-top:10px;min-height:0;padding:13px 12px;border-top-width:3px}
+  .detail-panel .panel-title{font-size:17px;margin-bottom:10px}
+  .detail-empty{padding:28px 12px;font-size:12px}
+  .detail-heading{align-items:flex-start;padding-bottom:10px}
+  .detail-heading h3{font-size:17px}
+  .kv{grid-template-columns:82px minmax(0,1fr);gap:9px 8px;font-size:13px;margin-top:12px}
+  .kv .k{font-size:12px}
+
+  .footer{margin-top:10px;padding:13px 12px;font-size:11px;line-height:1.65}
+
+  .drawer-panel{inset:0;width:100%;padding:16px;border:0;border-top:4px solid var(--blue);box-shadow:none}
+  .modal-head{top:-16px;padding:15px 0 10px}
+  .modal-head h2{font-size:19px}
+  .module-catalog-item{min-height:48px;padding:11px 10px;align-items:flex-start}
+  .module-catalog-count{white-space:normal;text-align:right;max-width:100px}
+  .source{padding:12px 10px}
+}
+
+@media (max-width:380px){
+  .brand-block h1{font-size:18px}
+  .top-link{font-size:11px}
+  .mode-options label{font-size:11px}
+  .results-head{align-items:flex-start}
+  .export-btn{padding:7px 6px}
+  tbody td{grid-template-columns:70px minmax(0,1fr)}
+}
