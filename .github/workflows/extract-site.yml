@@ -1,0 +1,42 @@
+name: Extract static site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site.zip'
+      - '.github/workflows/extract-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Extract dashboard files
+        run: |
+          rm -rf _extract
+          mkdir _extract
+          unzip -o site.zip -d _extract
+          cp _extract/index.html ./index.html
+          cp _extract/regulations.json ./regulations.json
+          mkdir -p docs
+          cp _extract/index.html docs/index.html
+          cp _extract/regulations.json docs/regulations.json
+          touch .nojekyll
+          touch docs/.nojekyll
+      - name: Commit extracted site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html regulations.json .nojekyll docs/index.html docs/regulations.json docs/.nojekyll
+          if git diff --cached --quiet; then
+            echo "No extracted site changes"
+          else
+            git commit -m "Publish extracted dashboard files"
+            git push
+          fi
