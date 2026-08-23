@@ -5,96 +5,165 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>食品法規適用性儀表板</title>
-<link rel="stylesheet" href="css/style.css?v=20260823-refactor1">
+<title>食品法規適用性查詢</title>
+<link rel="stylesheet" href="css/style.css?v=20260823-ui2">
 </head>
 <body>
-<div class="shell">
-<section class="hero">
-  <div class="hero-top">
-    <div>
-      <div class="eyebrow">FOOD REGULATORY COMPLIANCE DASHBOARD</div>
-      <h1>食品法規適用性儀表板</h1>
-      <p>最後校正日期：<span id="lastReviewed">2026-08-23</span></p>
-    </div>
-    <span class="badge" id="modeBadge">● 現行規定</span>
+<div class="app-shell">
+<header class="topbar">
+  <div class="brand-block">
+    <h1>食品法規適用性查詢</h1>
+    <div class="reviewed">最後校正日期：<span id="lastReviewed">2026-08-23</span></div>
   </div>
-  <div class="actions">
-    <button class="btn ghost" id="csvBtn">匯出目前查詢 CSV</button>
-    <button class="btn ghost" id="jumpBtn">進入法規查詢</button>
-    <button class="btn ghost" id="modulesBtn">已納入法規</button>
-    <button class="btn ghost" id="sourcesBtn">資料來源</button>
-  </div>
-</section>
+  <nav class="top-actions" aria-label="輔助功能">
+    <button type="button" class="top-link" id="sourcesBtn">資料來源</button>
+    <button type="button" class="top-link" id="modulesBtn">已納入法規</button>
+    <button type="button" class="top-link" id="helpBtn">操作說明</button>
+  </nav>
+</header>
 
-<section class="section" id="querySection">
-  <div class="section-head"><div><h2>法規查詢</h2><div class="small">預設顯示截至目前已生效且整併後的現行適用範圍；需要追溯過去期程時切換「歷史沿革」；查看已公告但尚未生效規定時切換「未來實施」</div></div><div class="search-count" id="count"></div></div>
-  <div class="card filters">
-    <div class="filtergrid">
-      <label><span>顯示方式</span><select id="viewMode"><option value="current">現行規定</option><option value="history">歷史沿革</option><option value="future">未來實施</option></select></label>
-      <label><span>關鍵字</span><input id="q" type="search" placeholder="輸入業別、產品、規模或法規"></label>
-      <label><span>法規模組</span><select id="module"><option value="">全部模組</option></select></label>
-      <label><span>業態</span><select id="area"><option value="">全部業態</option></select></label>
-      <label><span>狀態</span><select id="status"><option value="">全部狀態</option><option>已實施</option><option>未來實施</option></select></label>
+<main class="main-content">
+  <section class="panel query-panel" id="querySection">
+    <div class="panel-title">查詢條件</div>
+    <div class="query-grid">
+      <label class="field field-keyword">
+        <span>關鍵字</span>
+        <input id="q" type="search" placeholder="輸入業別、產品、規模或法規">
+      </label>
+      <label class="field">
+        <span>法規模組</span>
+        <select id="module"><option value="">全部模組</option></select>
+      </label>
+      <label class="field">
+        <span>業態</span>
+        <select id="area"><option value="">全部業態</option></select>
+      </label>
+      <fieldset class="field mode-field">
+        <legend>規定模式</legend>
+        <div class="mode-options">
+          <label><input type="radio" name="viewMode" value="current" checked><span>現行規定</span></label>
+          <label><input type="radio" name="viewMode" value="history"><span>歷史沿革</span></label>
+          <label><input type="radio" name="viewMode" value="future"><span>未來實施</span></label>
+        </div>
+      </fieldset>
     </div>
-    <div class="toolbar">
-      <div class="chips" id="quickChips"></div>
-      <button class="btn" id="resetBtn" type="button">清除篩選</button>
+    <div class="query-actions">
+      <button class="btn secondary" id="resetBtn" type="button">清除條件</button>
+      <button class="btn primary" id="searchBtn" type="button">查詢</button>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="section two">
-  <div class="card table-card">
-    <div class="tablewrap">
-      <table>
-        <thead><tr><th>法規模組</th><th>業態</th><th>產品／業別</th><th>規模／條件</th><th>實施日</th><th>狀態</th></tr></thead>
-        <tbody id="rows"><tr><td colspan="6" style="padding:32px;text-align:center;color:#667269">正在載入法規資料…</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-  <aside class="card detail">
-    <div class="small">規則詳細資料</div>
-    <div id="detailEmpty" class="detail-empty">請點選左側任一規則查看法源與判讀備註</div>
-    <div id="detailBox" hidden>
-      <h3 id="dTitle"></h3>
-      <div style="margin-top:8px"><span class="status" id="dStatus"></span></div>
-      <div class="kv">
-        <div class="k">法規模組</div><div id="dModule"></div>
-        <div class="k">業態</div><div id="dArea"></div>
-        <div class="k">規模條件</div><div id="dScale"></div>
-        <div class="k">實施日期</div><div id="dStart"></div>
-        <div class="k">法源</div><div id="dBasis"></div>
-        <div class="k">判讀備註</div><div id="dNote"></div>
-        <div class="k">官方來源</div><div><a id="dSource" target="_blank" rel="noopener"></a></div>
+  <section class="panel module-panel">
+    <div class="panel-title compact-title">法規模組篩選</div>
+    <div class="module-tabs" id="quickChips"></div>
+  </section>
+
+  <section class="content-grid">
+    <div class="panel results-panel">
+      <div class="results-head">
+        <h2>查詢結果 <span class="result-count" id="count"></span></h2>
+        <button class="btn export-btn" id="csvBtn" type="button">匯出目前查詢CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>法規模組</th>
+              <th>業態</th>
+              <th>產品／業別</th>
+              <th>規模／條件</th>
+              <th>實施日期</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td colspan="6" class="loading-cell">正在載入法規資料…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar">
+        <label class="page-size">每頁顯示
+          <select id="pageSize">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          筆
+        </label>
+        <div class="page-info" id="pageInfo"></div>
+        <div class="pager" id="pager" aria-label="分頁"></div>
       </div>
     </div>
-  </aside>
-</section>
 
-<div class="module-modal" id="modulesModal" aria-hidden="true">
-  <div class="module-modal-backdrop" data-close-modules></div>
-  <div class="module-modal-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
-    <div class="module-modal-head"><div><div class="small">目前資料庫收錄範圍</div><h2 id="modulesModalTitle">已納入法規</h2></div><button class="btn" type="button" id="modulesCloseBtn">關閉</button></div>
-    <p class="small">目前共納入 <strong id="moduleCount">0</strong> 個法規模組。點選模組可直接套用查詢條件</p>
+    <aside class="panel detail-panel">
+      <div class="panel-title">詳細內容</div>
+      <div id="detailEmpty" class="detail-empty">請點選左側任一規則查看法源、適用條件與判讀備註</div>
+      <div id="detailBox" hidden>
+        <div class="detail-heading">
+          <h3 id="dTitle"></h3>
+          <span class="status" id="dStatus"></span>
+        </div>
+        <div class="kv">
+          <div class="k">法規模組</div><div id="dModule"></div>
+          <div class="k">業態</div><div id="dArea"></div>
+          <div class="k">產品／業別</div><div id="dCategory"></div>
+          <div class="k">規模／條件</div><div id="dScale"></div>
+          <div class="k">實施日期</div><div id="dStart"></div>
+          <div class="k">法源</div><div id="dBasis"></div>
+          <div class="k">官方來源</div><div><a id="dSource" target="_blank" rel="noopener"></a></div>
+          <div class="k">判讀備註</div><div id="dNote"></div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<footer class="footer">
+  <div>本網站為法規管理與初步適用性判讀工具，不取代主管機關正式解釋、個案法律意見或最新法規原文。若業者同時具多種業態、委外製造、兼營輸入或產品分類有疑義，應回到各公告附表及 Q&amp;A 逐項確認</div>
+  <div class="version-line">資料版本：<span id="dataVersion">2026-08-23</span></div>
+</footer>
+</div>
+
+<div class="drawer-modal" id="modulesModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-modules></div>
+  <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
+    <div class="modal-head">
+      <div><div class="modal-kicker">目前資料庫收錄範圍</div><h2 id="modulesModalTitle">已納入法規</h2></div>
+      <button class="btn secondary" type="button" id="modulesCloseBtn">關閉</button>
+    </div>
+    <p class="modal-note">目前共納入 <strong id="moduleCount">0</strong> 個法規模組。點選模組可直接套用查詢條件</p>
     <div class="module-catalog" id="moduleCatalog"></div>
   </div>
 </div>
 
-<div class="source-modal" id="sourceModal" aria-hidden="true">
-  <div class="source-modal-backdrop" data-close-sources></div>
-  <div class="source-modal-panel" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
-    <div class="source-modal-head"><div><div class="small">法規查核與更新</div><h2 id="sourceModalTitle">資料來源</h2></div><button class="btn" type="button" id="sourcesCloseBtn">關閉</button></div>
-    <p class="small" style="margin:4px 0 14px">集中收錄本儀表板使用的食藥署正式公告、現行 Q&A 與法規入口</p>
+<div class="drawer-modal" id="sourceModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-sources></div>
+  <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
+    <div class="modal-head">
+      <div><div class="modal-kicker">法規查核與更新</div><h2 id="sourceModalTitle">資料來源</h2></div>
+      <button class="btn secondary" type="button" id="sourcesCloseBtn">關閉</button>
+    </div>
+    <p class="modal-note">集中收錄本查詢工具使用的正式公告、現行 Q&amp;A 與法規入口</p>
     <div class="sources" id="sources"></div>
   </div>
 </div>
 
-<div class="footer">
-  <div>本網站為法規管理與初步適用性判讀工具，不取代主管機關正式解釋、個案法律意見或最新法規原文。若業者同時具多種業態、委外製造、兼營輸入或產品分類有疑義，應回到各公告附表及 Q&amp;A 逐項確認</div>
-  <div style="margin-top:6px">資料版本：<span id="dataVersion">2026-08-23</span></div>
+<div class="drawer-modal" id="helpModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-help></div>
+  <div class="drawer-panel help-panel" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="modal-head">
+      <div><div class="modal-kicker">使用方式</div><h2 id="helpModalTitle">操作說明</h2></div>
+      <button class="btn secondary" type="button" id="helpCloseBtn">關閉</button>
+    </div>
+    <ol class="help-list">
+      <li>可用關鍵字、法規模組與業態篩選規則。</li>
+      <li>「現行規定」顯示目前已生效的整併適用條件；「歷史沿革」查看過去已實施階段；「未來實施」只顯示已正式公告但尚未生效的規定。</li>
+      <li>點選查詢結果任一列，可在右側「詳細內容」查看法源、官方來源與判讀備註。</li>
+      <li>「匯出目前查詢CSV」會匯出目前篩選後的全部結果，不受分頁影響。</li>
+    </ol>
+  </div>
 </div>
-</div>
-<script src="js/app.js?v=20260823-refactor1" defer></script>
+
+<script src="js/app.js?v=20260823-ui2" defer></script>
 </body>
 </html>
