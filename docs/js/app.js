@@ -12,9 +12,11 @@ let selectedKey = '';
 let currentPage = 1;
 let pageSize = 10;
 
-const displayArea = r => (r.areas || []).join('／');
-const hasArea = (r, area) => !area || (r.areas || []).includes(area);
-const attachModule = (name, rows) => rows.map(r => ({...r, module:name}));
+const normalizeArea = a => a === '零售' ? '販售' : a;
+const normalizedAreas = r => [...new Set((r.areas || []).map(normalizeArea))];
+const displayArea = r => normalizedAreas(r).join('／');
+const hasArea = (r, area) => !area || normalizedAreas(r).includes(area);
+const attachModule = (name, rows) => rows.map(r => ({...r, areas: normalizedAreas(r), module:name}));
 const ruleKey = r => `${r.module}::${r.id}`;
 const viewMode = () => document.querySelector('input[name="viewMode"]:checked')?.value || 'current';
 
@@ -50,7 +52,7 @@ function moduleLabel(name){
 
 function populateControls(){
   MODULES.forEach(m => $('#module').insertAdjacentHTML('beforeend', `<option value="${esc(m.name)}">${esc(m.name)}</option>`));
-  const areas = [...new Set(RULES.flatMap(r => r.areas || []))].sort((a,b) => a.localeCompare(b,'zh-Hant'));
+  const areas = [...new Set(RULES.flatMap(r => normalizedAreas(r)))].sort((a,b) => a.localeCompare(b,'zh-Hant'));
   areas.forEach(a => $('#area').insertAdjacentHTML('beforeend', `<option value="${esc(a)}">${esc(a)}</option>`));
   $('#quickChips').innerHTML = `<button class="module-tab on" type="button" data-v="">全部模組</button>` + MODULES.map(m => `<button class="module-tab" type="button" data-v="${esc(m.name)}">${esc(moduleLabel(m.name))}</button>`).join('');
   $('#quickChips').addEventListener('click', e => {
