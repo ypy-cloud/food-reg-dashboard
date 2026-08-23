@@ -1,3 +1,14 @@
-# 食品法規適用性儀表板
+# Food Regulatory Dashboard
 
-台灣食品相關法規查詢與管理階層展示網站。
+GitHub Pages publishes from `main/docs`.
+
+## Structure
+
+- `docs/index.html`: page shell
+- `docs/css/style.css`: visual styles
+- `docs/js/app.js`: query/render logic
+- `docs/data/manifest.json`: module registry
+- `docs/data/*.json`: one regulatory module per file
+- `docs/data/sources.json`: official source catalog
+
+Development changes should be prepared on `dev` and promoted to `main` after verification.
