@@ -1,0 +1,1 @@
+GitHub Pages publishes this repository from /docs. The dashboard loader reads ./site.zip from the same published directory.
