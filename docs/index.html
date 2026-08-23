@@ -16,4 +16,50 @@ html=html.replace("const areas=[...new Set(RULES.map(r=>r.area))].sort();","cons
 html=html.replace("const chips=['食品安全監測計畫','強制檢驗','食品安全管制系統 HACCP','應自設實驗室','應置衛生管理人員','應置專門職業人員'];","const chips=['食品安全監測計畫','強制檢驗','食品安全管制系統 HACCP','應自設實驗室','應置衛生管理人員','應置專門職業人員','應置技術證照人員','產品責任險','食品追溯追蹤'];");
 html=html.replace("return $('#viewMode').value==='history' ? RULES : CURRENT_RULES;","const mode=$('#viewMode').value;if(mode==='history')return RULES.filter(r=>r.status!=='未來實施');if(mode==='future')return RULES.filter(r=>r.status==='未來實施');return CURRENT_RULES;").replace("$('#modeBadge').textContent=$('#viewMode').value==='history'?'● 歷次／分階段規定':'● 現行規定';","const mode=$('#viewMode').value;$('#modeBadge').textContent=mode==='history'?'● 歷史沿革':mode==='future'?'● 未來實施':'● 現行規定';").replace("if(id==='viewMode'&&$('#viewMode').value==='current'&&$('#status').value==='未來實施')$('#status').value='';","if(id==='viewMode'){$('#status').value='';}");
 html=html.replace('<button class="btn primary" id="printBtn">列印／存成 PDF</button>','').replace("$('#printBtn').addEventListener('click',()=>window.print());",'');
+html=html.replace('</style>',`
+.grid4{display:none!important}
+.module-catalog-summary{font-size:15px;color:var(--muted);margin:4px 0 14px}
+.module-catalog-list{display:grid;grid-template-columns:1fr;gap:9px}
+.module-catalog-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);cursor:pointer;text-align:left;width:100%;color:var(--text)}
+.module-catalog-item:hover{background:var(--green2);border-color:#bfd4c5}
+.module-catalog-name{font-weight:800}
+.module-catalog-count{font-size:12px;color:var(--muted);white-space:nowrap}
+</style>`);
+html=html.replace('<button class="btn ghost" id="sourcesBtn">資料來源</button>','<button class="btn ghost" id="modulesBtn">已納入法規</button><button class="btn ghost" id="sourcesBtn">資料來源</button>');
+html=html.replace('<div class="source-modal" id="sourceModal" aria-hidden="true">',`<div class="source-modal" id="modulesModal" aria-hidden="true">
+  <div class="source-modal-backdrop" data-close-modules></div>
+  <div class="source-modal-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
+    <div class="source-modal-head">
+      <div>
+        <div class="small">本儀表板目前收錄範圍</div>
+        <h2 id="modulesModalTitle">已納入法規</h2>
+      </div>
+      <button class="btn" type="button" id="modulesCloseBtn" aria-label="關閉已納入法規">關閉</button>
+    </div>
+    <div class="module-catalog-summary" id="modulesSummary"></div>
+    <div class="module-catalog-list" id="modulesList"></div>
+  </div>
+</div>
+
+<div class="source-modal" id="sourceModal" aria-hidden="true">`);
+html=html.replace('</body>',`<script>
+(()=>{
+  const btn=document.getElementById('modulesBtn'), modal=document.getElementById('modulesModal');
+  if(!btn||!modal)return;
+  const data=(typeof CURRENT_RULES!=='undefined'?CURRENT_RULES:[]);
+  const modules=[...new Set(data.map(r=>r.module))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+  const summary=document.getElementById('modulesSummary'), list=document.getElementById('modulesList');
+  summary.textContent='目前納入 '+modules.length+' 個法規模組';
+  list.innerHTML=modules.map(m=>{
+    const n=data.filter(r=>r.module===m).length;
+    return '<button type="button" class="module-catalog-item" data-module="'+m.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"><span class="module-catalog-name">'+m.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span><span class="module-catalog-count">'+n+' 筆現行規則</span></button>';
+  }).join('');
+  const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'};
+  const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow=''};
+  btn.addEventListener('click',open);document.getElementById('modulesCloseBtn').addEventListener('click',close);
+  modal.querySelectorAll('[data-close-modules]').forEach(el=>el.addEventListener('click',close));
+  list.addEventListener('click',e=>{const item=e.target.closest('[data-module]');if(!item)return;const sel=document.getElementById('module');if(sel){sel.value=item.dataset.module;close();document.getElementById('querySection')?.scrollIntoView({behavior:'smooth'});if(typeof render==='function')render()}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()});
+})();
+<\/script></body>`);
 document.open();document.write(html);document.close()}catch(e){document.getElementById('msg').textContent='頁面載入失敗';document.getElementById('err').textContent=String(e)}})();</script></body></html>
