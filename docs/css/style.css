@@ -79,9 +79,9 @@ tbody tr:hover{background:#f4f8fb}
 tbody tr.selected{background:#e7f0f7;box-shadow:inset 3px 0 0 var(--blue)}
 td.module-cell{font-weight:800;color:#1d3e5c}
 @media(min-width:721px){
-  table{min-width:1040px}
-  th:nth-child(1),td:nth-child(1){white-space:nowrap;min-width:170px}
-  th:nth-child(2),td:nth-child(2){white-space:nowrap;min-width:72px}
+  table{min-width:980px}
+  th:nth-child(1),td:nth-child(1){white-space:normal;word-break:keep-all;overflow-wrap:normal;width:150px;min-width:150px;max-width:150px}
+  th:nth-child(2),td:nth-child(2){white-space:nowrap;min-width:72px;width:72px}
 }
 .status{display:inline-flex;align-items:center;border-radius:0;padding:3px 7px;font-size:11px;font-weight:800;white-space:nowrap;border-left:3px solid currentColor}
 .status.active{background:var(--blue-soft);color:var(--blue)}
