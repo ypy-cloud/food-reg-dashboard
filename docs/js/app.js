@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const $ = s => document.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 let manifest = null;
 let MODULES = [];
 let SOURCES = [];
@@ -19,6 +19,9 @@ const hasArea = (r, area) => !area || normalizedAreas(r).includes(area);
 const attachModule = (name, rows) => rows.map(r => ({...r, areas: normalizedAreas(r), module:name}));
 const ruleKey = r => `${r.module}::${r.id}`;
 const viewMode = () => document.querySelector('input[name="viewMode"]:checked')?.value || 'current';
+const isGenericFoodRule = r => /其他食品|其他.*食品.*業|其餘食品/.test(String(r.category || ''));
+const categoryMatches = (r, q) => String(r.category || '').toLowerCase().includes(q);
+const fullTextMatches = (r, q) => [r.module, displayArea(r), r.category, r.scale, r.start, r.note, r.basis, r.sourceName].join(' ').toLowerCase().includes(q);
 
 async function loadJson(url){
   const sep = url.includes('?') ? '&' : '?';
@@ -76,10 +79,45 @@ function applyFilters(){
   const q = $('#q').value.trim().toLowerCase();
   const m = $('#module').value;
   const a = $('#area').value;
-  filtered = data.filter(r => {
-    const hay = [r.module, displayArea(r), r.category, r.scale, r.start, r.note, r.basis, r.sourceName].join(' ').toLowerCase();
-    return (!q || hay.includes(q)) && (!m || r.module === m) && hasArea(r,a);
+  const scoped = data.filter(r => (!m || r.module === m) && hasArea(r,a));
+
+  if(!q){
+    filtered = scoped;
+    return;
+  }
+
+  const direct = scoped.filter(r => fullTextMatches(r,q));
+  const isProductKeyword = data.some(r => !isGenericFoodRule(r) && categoryMatches(r,q));
+  if(!isProductKeyword){
+    filtered = direct;
+    return;
+  }
+
+  const modulesWithSpecificMatch = new Set(
+    scoped.filter(r => !isGenericFoodRule(r) && categoryMatches(r,q)).map(r => r.module)
+  );
+
+  const chosen = [];
+  const seen = new Set();
+  const add = r => {
+    const key = ruleKey(r);
+    if(seen.has(key)) return;
+    seen.add(key);
+    chosen.push(r);
+  };
+
+  direct.forEach(r => {
+    if(isGenericFoodRule(r) && modulesWithSpecificMatch.has(r.module)) return;
+    add(r);
   });
+
+  scoped.forEach(r => {
+    if(!isGenericFoodRule(r)) return;
+    if(modulesWithSpecificMatch.has(r.module)) return;
+    add(r);
+  });
+
+  filtered = chosen;
 }
 
 function render(){
