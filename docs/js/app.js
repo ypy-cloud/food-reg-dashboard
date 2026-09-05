@@ -19,9 +19,10 @@ const hasArea = (r, area) => !area || normalizedAreas(r).includes(area);
 const attachModule = (name, rows) => rows.map(r => ({...r, areas: normalizedAreas(r), module:name}));
 const ruleKey = r => `${r.module}::${r.id}`;
 const viewMode = () => document.querySelector('input[name="viewMode"]:checked')?.value || 'current';
+const normalizeSearchText = s => String(s ?? '').toLowerCase().replace(/[,，]/g,'');
 const isGenericFoodRule = r => /其他食品|其他.*食品.*業|其餘食品/.test(String(r.category || ''));
-const categoryMatches = (r, q) => String(r.category || '').toLowerCase().includes(q);
-const fullTextMatches = (r, q) => [r.module, displayArea(r), r.category, r.scale, r.start, r.note, r.basis, r.sourceName].join(' ').toLowerCase().includes(q);
+const categoryMatches = (r, q) => normalizeSearchText(r.category).includes(q);
+const fullTextMatches = (r, q) => normalizeSearchText([r.module, displayArea(r), r.category, r.scale, r.start, r.note, r.basis, r.sourceName].join(' ')).includes(q);
 
 async function loadJson(url){
   const sep = url.includes('?') ? '&' : '?';
@@ -76,7 +77,7 @@ function syncModuleTabs(){
 
 function applyFilters(){
   const data = activeData();
-  const q = $('#q').value.trim().toLowerCase();
+  const q = normalizeSearchText($('#q').value.trim());
   const m = $('#module').value;
   const a = $('#area').value;
   const scoped = data.filter(r => (!m || r.module === m) && hasArea(r,a));
