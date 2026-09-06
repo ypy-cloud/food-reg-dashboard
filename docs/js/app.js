@@ -38,7 +38,7 @@ async function loadData(){
   MODULES = manifest.modules;
   RULES = datasets.flatMap(d => attachModule(d.name, d.rules || []));
   CURRENT_RULES = datasets.flatMap(d => attachModule(d.name, d.current || (d.rules || []).filter(r => r.status !== '未來實施')));
-  $('#lastReviewed').textContent = manifest.lastReviewed || manifest.version;
+  $('#lastUpdated').textContent = manifest.version;
   $('#dataVersion').textContent = manifest.version;
 }
 

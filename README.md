@@ -59,3 +59,7 @@ TFDA表列的是相關科系及所屬學類，不代表整個學類所有系所�
 - 沒有建立第二份手機資料，亦未加入列印／PDF功能。
 
 正式發布仍為 GitHub Pages `main /docs`。應先確認兩分支遠端沒有新變更，保留既有歷史再合併；部署後核對正式頁面的專區版本與manifest。
+
+### 頁面日期
+
+頁首「最後更新日期」及頁尾「資料版本」共用 manifest.version，使用 YYYY-MM-DD 純日期，不附加修訂序號；同日程式修訂以 Git commit 及靜態資源查詢參數識別。manifest.lastReviewed 保留全站法規校正紀錄，專區查核日期仍由 tools.hygieneManager.lastReviewed 提供。功能更新不推進未重新查核的法規日期。

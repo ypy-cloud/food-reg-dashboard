@@ -1,7 +1,7 @@
 {
   "id": "hygiene-qualifications",
   "name": "衛生管理人員資格路徑",
-  "version": "2026-09-06.2",
+  "version": "2026-09-06",
   "lastReviewed": "2026-09-06",
   "effectiveFrom": "2020-07-01",
   "sourceIds": ["hm-law", "hm-qa", "hm-major-guidance"],
