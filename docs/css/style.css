@@ -155,3 +155,45 @@ td.module-cell{font-weight:800;color:#1d3e5c}
   .footer{padding:13px 15px}
   .drawer-panel{inset:8px;width:auto}
 }
+
+/* Hygiene manager tools share the existing rectangular visual language. */
+[hidden]{display:none!important}
+.regulations-section{display:grid;gap:12px}
+.section-navigation{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.hygiene-header{padding:16px;border-top:3px solid var(--blue);margin-bottom:12px}
+.hygiene-header h2{margin:0 0 14px;color:var(--blue-dark);font-size:21px}
+.tool-tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:12px}
+.tool-tabs .module-tab{font-size:14px;min-height:40px}
+.hygiene-main{display:grid;gap:12px;min-width:0}
+.hygiene-query-grid{align-items:start;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.major-query-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tool-note{font-size:12px;color:var(--muted);line-height:1.6;font-weight:400}
+.text-link{border:0;background:none;color:var(--blue);text-align:left;padding:5px 0;font-size:12px;text-decoration:underline;cursor:pointer}
+.result-note{padding:0 15px}
+.hygiene-detail{font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.hygiene-detail section+section{border-top:1px solid var(--border);margin-top:18px;padding-top:12px}
+.hygiene-detail h3{font-size:15px;color:var(--blue-dark);margin:0 0 8px}
+.hygiene-detail ul,.document-list{padding-left:22px}
+.hygiene-detail li{margin:6px 0}
+.hygiene-detail a{display:inline-block;margin:4px 0}
+.hygiene-detail summary{cursor:pointer;color:var(--blue);font-weight:700}
+.tool-caution{border-left:3px solid var(--orange);background:var(--orange-soft);padding:8px 10px;font-size:12px}
+.document-btn{font-size:12px;min-height:32px;padding:5px 8px;color:var(--blue);white-space:nowrap}
+.tool-table tbody tr{cursor:default}
+#majorPanel>.query-panel{margin-bottom:12px}
+.tool-table .tool-note{margin:5px 0}
+@media(min-width:721px){
+  .tool-table{table-layout:fixed;min-width:840px}
+  .tool-table th,.tool-table td{white-space:normal;word-break:normal;overflow-wrap:anywhere}
+  .qualification-table th:nth-child(1),.qualification-table td:nth-child(1){width:100px}
+  .qualification-table th:nth-child(2),.qualification-table td:nth-child(2){width:130px}
+  .qualification-table th:nth-child(3),.qualification-table td:nth-child(3){width:105px}
+  .qualification-table th:nth-child(4),.qualification-table td:nth-child(4){width:155px}
+  .qualification-table th:nth-child(5),.qualification-table td:nth-child(5){width:155px}
+  .qualification-table th:nth-child(6),.qualification-table td:nth-child(6){width:100px}
+  .qualification-table th:nth-child(7),.qualification-table td:nth-child(7){width:105px}
+  .major-table th,.major-table td{width:auto}
+  .major-table th:nth-child(5),.major-table td:nth-child(5){width:240px}
+  .major-table th:nth-child(8),.major-table td:nth-child(8){width:100px}
+}
+@media(max-width:1120px){.hygiene-query-grid,.major-query-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

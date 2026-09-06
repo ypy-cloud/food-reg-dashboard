@@ -6,8 +6,9 @@
 <meta name="color-scheme" content="light">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
-<link rel="stylesheet" href="css/style.css?v=20260823-ui3">
-<link rel="stylesheet" href="css/mobile.css?v=20260823-mobile1">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css?v=20260906-hm1">
+<link rel="stylesheet" href="css/mobile.css?v=20260906-hm1">
 </head>
 <body>
 <div class="app-shell">
@@ -24,6 +25,70 @@
 </header>
 
 <main class="main-content">
+<nav class="panel section-navigation" aria-label="主要功能">
+  <button type="button" class="module-tab on" id="regulationsNav" aria-pressed="true">食品法規適用性查詢</button>
+  <button type="button" class="module-tab" id="hygieneNav" aria-pressed="false">衛生管理人員專區</button>
+</nav>
+<section id="hygieneSection" hidden aria-labelledby="hygieneTitle">
+  <header class="panel hygiene-header">
+    <h2 id="hygieneTitle">衛生管理人員專區</h2>
+    <div class="tool-tabs" role="tablist" aria-label="衛生管理人員工具">
+      <button type="button" class="module-tab on" role="tab" id="qualificationTab" aria-controls="qualificationPanel" aria-selected="true">資格與應備文件查詢</button>
+      <button type="button" class="module-tab" role="tab" id="majorTab" aria-controls="majorPanel" aria-selected="false" tabindex="-1">相關科系／學類代碼查詢</button>
+    </div>
+    <p class="tool-note" id="hmScope"></p>
+    <p class="tool-note">專區最後確認日期：<span id="hmReviewed">載入中</span></p>
+  </header>
+  <div id="hmLoadError" hidden class="load-error" role="alert"></div>
+  <div id="qualificationPanel" role="tabpanel" aria-labelledby="qualificationTab">
+    <div class="content-grid hygiene-grid">
+      <div class="hygiene-main">
+        <form class="panel query-panel" id="qualificationForm">
+          <h3 class="panel-title">查詢條件</h3>
+          <div class="query-grid hygiene-query-grid">
+            <label class="field"><span>業別</span><input type="search" id="hmIndustry" placeholder="例如：肉類、乳品、中央廚房"></label>
+            <label class="field"><span>科系</span><input type="search" id="hmMajor" placeholder="大專科系或高職指定科別"><button class="text-link" type="button" id="majorShortcut">不確定科系資格？查學類代碼</button></label>
+            <label class="field"><span>學校名稱</span><input type="search" id="hmSchool" placeholder="協助辨識系所"></label>
+            <label class="field"><span>學歷</span><select id="hmEducation"><option value="">全部</option></select></label>
+            <label class="field"><span>證照</span><select id="hmLicense"><option value="">全部</option></select></label>
+            <label class="field"><span>資本額</span><select id="hmCapital"><option value="">全部</option></select></label>
+          </div>
+          <p class="tool-note">業別、科系至少填一項。學校名稱只協助辨識系所，不影響資格。證照欄視為已持有證照，仍列出其他可選資格路徑。</p>
+          <div class="query-actions"><button class="btn secondary" type="reset">清除條件</button><button class="btn primary" type="submit" id="hmSearch" disabled>查詢</button></div>
+        </form>
+        <div class="panel results-panel">
+          <div class="results-head"><h2>查詢結果 <span class="result-count" id="hmCount"></span></h2></div>
+          <p class="tool-note result-note" id="hmMessage" role="status" aria-live="polite">請輸入業別或科系開始查詢。</p>
+          <div class="tablewrap"><table class="tool-table qualification-table"><thead><tr><th>業別</th><th>學歷／資格路徑</th><th>資本額條件</th><th>HACCP 情境</th><th>主要資格條件摘要</th><th>法源</th><th>操作</th></tr></thead><tbody id="hmRows"></tbody></table></div>
+          <div class="pagination-bar"><span class="page-info" id="hmPageInfo"></span><div class="pager" id="hmPager" aria-label="資格查詢分頁"></div></div>
+        </div>
+      </div>
+      <aside class="panel detail-panel" id="hmDetailPanel" tabindex="-1" aria-labelledby="hmDetailTitle"><h2 class="panel-title" id="hmDetailTitle">詳細內容</h2><div id="hmDetail" class="detail-empty">請點選任一結果的「應備文件」。</div></aside>
+    </div>
+  </div>
+  <div id="majorPanel" role="tabpanel" aria-labelledby="majorTab" hidden>
+    <form class="panel query-panel" id="majorForm">
+      <h3 class="panel-title">相關科系／學類代碼查詢</h3>
+      <div class="query-grid major-query-grid">
+        <label class="field"><span>科系名稱</span><input type="search" id="mcMajor" placeholder="例如：食品科學系、食品加工科"></label>
+        <label class="field"><span>學校名稱</span><input type="search" id="mcSchool" placeholder="例如：國立臺灣海洋大學"></label>
+        <label class="field"><span>學類名稱</span><input type="search" id="mcClass" placeholder="例如：食品科學學類"></label>
+        <label class="field"><span>學類代碼</span><input type="search" id="mcCode" placeholder="學類、細學類或完整科系代碼"></label>
+      </div>
+      <p class="tool-note" id="mcCoverage"></p>
+      <p class="tool-note">學校名稱只協助辨識系所。大專主要學類碼為4碼、細學類碼為5碼；高職採群別／科別代碼，兩者不可互換。判讀狀態僅指科系路徑，完整資格請回到資格查詢。</p>
+      <div class="query-actions"><button type="reset" class="btn secondary">清除條件</button><button type="submit" class="btn primary" id="mcSearch" disabled>查詢</button></div>
+    </form>
+    <div class="panel results-panel">
+      <div class="results-head"><h2>科系查詢結果 <span class="result-count" id="mcCount"></span></h2></div>
+      <p class="tool-note result-note" id="mcMessage" role="status" aria-live="polite">可依任一欄位查詢，或直接查詢全部已收錄資料。</p>
+      <div class="tablewrap"><table class="tool-table major-table"><thead><tr><th>學校</th><th>科系名稱</th><th>學類名稱</th><th>學類代碼</th><th>相關科系判讀</th><th>對應資格條文</th><th>資料來源</th><th>最後確認日期</th></tr></thead><tbody id="mcRows"></tbody></table></div>
+      <div class="pagination-bar"><span class="page-info" id="mcPageInfo"></span><div class="pager" id="mcPager" aria-label="科系查詢分頁"></div></div>
+    </div>
+  </div>
+</section>
+
+<div id="regulationsSection" class="regulations-section">
   <section class="panel query-panel" id="querySection">
     <div class="panel-title">查詢條件</div>
     <div class="query-grid">
@@ -117,6 +182,7 @@
       </div>
     </aside>
   </section>
+</div>
 </main>
 
 <footer class="footer">
@@ -165,6 +231,8 @@
   </div>
 </div>
 
-<script src="js/app.js?v=20260823-ui2" defer></script>
+<script src="js/hygiene-manager.js?v=20260906-hm1" defer></script>
+<script src="js/hygiene-ui.js?v=20260906-hm1" defer></script>
+<script src="js/app.js?v=20260906-hm1" defer></script>
 </body>
 </html>

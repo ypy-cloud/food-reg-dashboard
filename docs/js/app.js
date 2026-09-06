@@ -26,7 +26,7 @@ const fullTextMatches = (r, q) => normalizeSearchText([r.module, displayArea(r),
 
 async function loadJson(url){
   const sep = url.includes('?') ? '&' : '?';
-  const r = await fetch(url + sep + 'v=20260823-ui2', {cache:'no-store'});
+  const r = await fetch(url + sep + 'v=20260906-hm1', {cache:'no-store'});
   if(!r.ok) throw new Error(`${url} 載入失敗：HTTP ${r.status}`);
   return r.json();
 }
@@ -72,7 +72,7 @@ function populateControls(){
 
 function syncModuleTabs(){
   const value = $('#module').value;
-  document.querySelectorAll('.module-tab').forEach(x => x.classList.toggle('on', (x.dataset.v || '') === value));
+  document.querySelectorAll('#quickChips .module-tab').forEach(x => x.classList.toggle('on', (x.dataset.v || '') === value));
 }
 
 function applyFilters(){
@@ -299,6 +299,7 @@ async function init(){
     setupHelp();
     setupEvents();
     render();
+    window.HygieneManagerUI.init({manifest, sources:SOURCES, loadJson});
   }catch(err){
     console.error(err);
     $('#rows').innerHTML = `<tr><td colspan="6"><div class="load-error">法規資料載入失敗：${esc(err.message || err)}</div></td></tr>`;

@@ -1,0 +1,450 @@
+{
+  "id": "hygiene-industries",
+  "name": "工廠資格查詢HACCP情境",
+  "version": "2026-09-06",
+  "lastReviewed": "2026-09-06",
+  "sourceIds": [
+    "haccp-index"
+  ],
+  "assumption": "以須辦理工廠登記為前提；複合業別若任一公告適用，應採 HACCP 情境。",
+  "industries": [
+    {
+      "id": "meat",
+      "name": "肉類加工食品業",
+      "aliases": [
+        "肉類",
+        "肉品",
+        "畜禽肉",
+        "肉類加工"
+      ],
+      "sourceIds": [
+        "haccp-meat"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "產品畜禽肉類或雜碎含量達50%，且食品從業人員5人以上。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "out",
+          "haccp": false,
+          "condition": "產品畜禽肉類或雜碎含量未達50%，或食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "fish",
+      "name": "水產加工食品業",
+      "aliases": [
+        "水產",
+        "魚類",
+        "魚肉",
+        "水產食品"
+      ],
+      "sourceIds": [
+        "haccp-fish"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "產品水產動物含量達50%，且食品從業人員5人以上。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "out",
+          "haccp": false,
+          "condition": "產品水產動物含量未達50%，或食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "dairy",
+      "name": "乳品加工食品業（公告所列乳品）",
+      "aliases": [
+        "乳品",
+        "鮮乳",
+        "食用動物乳",
+        "保久乳",
+        "調味乳",
+        "發酵乳",
+        "乳粉",
+        "乾酪",
+        "奶油"
+      ],
+      "sourceIds": [
+        "haccp-dairy"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "符合公告第三點所列24種乳品之定義，且須辦理工廠登記。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": "本列業別限公告第三點乳品；僅添加乳原料的其他食品不能只依名稱套用。調味乳乳原料至少50%、發酵乳飲品發酵乳至少40%，其他產品依官方定義核對。"
+    },
+    {
+      "id": "thermal",
+      "name": "熱殺菌密閉容器包裝低酸性食品及酸化食品工廠",
+      "aliases": [
+        "熱殺菌",
+        "低酸性",
+        "酸化食品"
+      ],
+      "sourceIds": [
+        "haccp-thermal"
+      ],
+      "scenarios": [
+        {
+          "id": "large",
+          "haccp": true,
+          "condition": "產品屬熱殺菌密閉容器包裝低酸性食品或酸化食品；資本額3,000萬元以上。",
+          "capital": [
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "small-in",
+          "haccp": true,
+          "condition": "產品屬熱殺菌密閉容器包裝低酸性食品或酸化食品；資本額未達3,000萬元，且食品從業人員5人以上。",
+          "capital": [
+            "under30m"
+          ]
+        },
+        {
+          "id": "small-out",
+          "haccp": false,
+          "condition": "資本額未達3,000萬元，且食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "canned",
+      "name": "罐頭食品工廠（須核對產品範圍）",
+      "aliases": [
+        "罐頭"
+      ],
+      "sourceIds": [
+        "haccp-thermal"
+      ],
+      "scenarios": [
+        {
+          "id": "large",
+          "haccp": true,
+          "condition": "產品屬熱殺菌密閉容器包裝低酸性食品或酸化食品；資本額3,000萬元以上。",
+          "capital": [
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "small-in",
+          "haccp": true,
+          "condition": "產品屬熱殺菌密閉容器包裝低酸性食品或酸化食品；資本額未達3,000萬元，且食品從業人員5人以上。",
+          "capital": [
+            "under30m"
+          ]
+        },
+        {
+          "id": "small-out",
+          "haccp": false,
+          "condition": "資本額未達3,000萬元，且食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m"
+          ]
+        },
+        {
+          "id": "outside-scope",
+          "haccp": false,
+          "condition": "產品不屬熱殺菌密閉容器包裝低酸性食品或酸化食品，且未屬其他 HACCP 指定業別。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "oil",
+      "name": "食用油脂工廠",
+      "aliases": [
+        "食用油",
+        "油脂",
+        "植物油",
+        "動物油"
+      ],
+      "sourceIds": [
+        "haccp-oil"
+      ],
+      "scenarios": [
+        {
+          "id": "large",
+          "haccp": true,
+          "condition": "從事食用油脂製造、加工或調配；資本額3,000萬元以上。",
+          "capital": [
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "small-in",
+          "haccp": true,
+          "condition": "從事食用油脂製造、加工或調配；資本額未達3,000萬元，且食品從業人員5人以上。",
+          "capital": [
+            "under30m"
+          ]
+        },
+        {
+          "id": "small-out",
+          "haccp": false,
+          "condition": "資本額未達3,000萬元，且食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "egg",
+      "name": "蛋製品工廠",
+      "aliases": [
+        "蛋製品",
+        "液蛋",
+        "蛋粉",
+        "醃製蛋",
+        "皮蛋",
+        "鹹蛋"
+      ],
+      "sourceIds": [
+        "haccp-egg"
+      ],
+      "scenarios": [
+        {
+          "id": "large",
+          "haccp": true,
+          "condition": "屬液蛋、乾燥蛋粉或醃製蛋品範圍；資本額3,000萬元以上。",
+          "capital": [
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "small-in",
+          "haccp": true,
+          "condition": "屬液蛋、乾燥蛋粉或醃製蛋品範圍；資本額未達3,000萬元，且食品從業人員5人以上。",
+          "capital": [
+            "under30m"
+          ]
+        },
+        {
+          "id": "small-out",
+          "haccp": false,
+          "condition": "資本額未達3,000萬元，且食品從業人員未達5人；且未因兼營其他公告業別納管。",
+          "capital": [
+            "under30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": ""
+    },
+    {
+      "id": "meal",
+      "name": "餐盒食品工廠",
+      "aliases": [
+        "餐盒",
+        "盒餐",
+        "團膳",
+        "便當"
+      ],
+      "sourceIds": [
+        "haccp-meal"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "須辦理工廠登記之餐盒食品工廠（含盒餐與團膳）；不另設每日供餐量門檻。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [
+        "kitchen"
+      ],
+      "note": ""
+    },
+    {
+      "id": "rail",
+      "name": "供應鐵路運輸旅客餐盒之食品業",
+      "aliases": [
+        "鐵路",
+        "台鐵",
+        "高鐵",
+        "鐵路餐盒"
+      ],
+      "sourceIds": [
+        "haccp-rail"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "鐵路運輸業自設（附設）廚房或委外產製餐盒，且具工廠登記。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [
+        "kitchen"
+      ],
+      "note": ""
+    },
+    {
+      "id": "kitchen",
+      "name": "中央廚房食品工廠",
+      "aliases": [
+        "中央廚房"
+      ],
+      "sourceIds": [
+        "haccp-meal",
+        "haccp-index"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "產製盒餐或團膳，屬公告餐盒食品工廠；或同時符合其他 HACCP 公告產品及規模。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "out",
+          "haccp": false,
+          "condition": "非屬公告餐盒食品工廠，也未因其他產品／規模落入 HACCP 公告範圍。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [
+        "kitchen"
+      ],
+      "note": ""
+    },
+    {
+      "id": "general",
+      "name": "其他食品製造工廠",
+      "aliases": [
+        "其他食品",
+        "一般食品",
+        "烘焙",
+        "麵包",
+        "餅乾",
+        "食品添加物",
+        "特殊營養",
+        "健康食品",
+        "冷凍食品",
+        "即食餐食",
+        "飲料",
+        "糖果",
+        "麵條"
+      ],
+      "sourceIds": [
+        "haccp-index"
+      ],
+      "scenarios": [
+        {
+          "id": "in",
+          "haccp": true,
+          "condition": "若產品與規模同時符合肉類、水產、乳品、低酸性／酸化食品、食用油脂、蛋製品、餐盒或鐵路餐盒公告，須依該公告實施 HACCP。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        },
+        {
+          "id": "out",
+          "haccp": false,
+          "condition": "未落入任一第8條第2項公告指定產品及規模範圍。",
+          "capital": [
+            "under30m",
+            "atLeast30m"
+          ]
+        }
+      ],
+      "tags": [],
+      "note": "此為跨產品類別；請以實際產品選取適用情境，必要時改以更具體業別查詢。"
+    }
+  ],
+  "unknown": {
+    "id": "unknown",
+    "name": "待確認食品製造業別",
+    "sourceIds": [
+      "haccp-index"
+    ],
+    "tags": [
+      "kitchen"
+    ],
+    "note": "尚未辨識到明確業別，以下為待核對的條件情境，不能當作免實施認定。",
+    "scenarios": [
+      {
+        "id": "in",
+        "haccp": true,
+        "condition": "若實際產品及規模符合食安法第8條第2項公告指定業者。",
+        "capital": [
+          "under30m",
+          "atLeast30m"
+        ]
+      },
+      {
+        "id": "out",
+        "haccp": false,
+        "condition": "若實際產品及規模均不屬食安法第8條第2項公告指定業者。",
+        "capital": [
+          "under30m",
+          "atLeast30m"
+        ]
+      }
+    ]
+  }
+}

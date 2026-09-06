@@ -1,1 +1,173 @@
-[{"name":"第一級品管專區（監測計畫、強制檢驗）","url":"https://www.fda.gov.tw/tc/siteList.aspx?pn=1&sid=10842","desc":"含115年3月Q&A、114年10月8日修正規定、附表與工具。"},{"name":"114/10/8 監測計畫與強制檢驗修正公告","url":"https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=31232","desc":"現行附表一、附表二及新增實施期程。"},{"name":"監測計畫／強制檢驗 Q&A（115年3月修｜PDF下載）","url":"https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=17580&id=f639104906636434473&type=2","desc":"115年3月修訂之最新Q&A問答集，發布日期2026-03-30；連結直接指向食藥署官方PDF檔案，可開啟或下載。"},{"name":"應設置實驗室 QA（115/5/28）","url":"https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=44256&id=f639156482191244625&type=2","desc":"自設實驗室類別、規模與實施日期。"},{"name":"應置衛生管理人員修正公告","url":"https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=25069","desc":"指定食品製造工廠類別及規模。"},{"name":"應置專門職業或技術人員 Q&A","url":"https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f638229434035027998","desc":"專門職業／技術證照人員適用類別與管理原則。"},{"name":"115/3/17 HACCP公告清單","url":"https://www.fda.gov.tw/TC/news.aspx?cid=3&op=5&pn=6","desc":"乳品、肉類、水產及低酸性／酸化食品等最新HACCP修正公告入口。"},{"name":"食品業者投保產品責任保險","url":"https://www.fda.gov.tw/tc/newscontent.aspx?cid=3&id=27328","desc":"現行投保對象、登記規模、最低保險金額及施行日期。"},{"name":"113/4/25 食品追溯追蹤公告","url":"https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=30519","desc":"現行應建立追溯追蹤系統之業者類別、規模與實施日期。"}]
+[
+  {
+    "name": "第一級品管專區（監測計畫、強制檢驗）",
+    "url": "https://www.fda.gov.tw/tc/siteList.aspx?pn=1&sid=10842",
+    "desc": "含115年3月Q&A、114年10月8日修正規定、附表與工具。"
+  },
+  {
+    "name": "114/10/8 監測計畫與強制檢驗修正公告",
+    "url": "https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=31232",
+    "desc": "現行附表一、附表二及新增實施期程。"
+  },
+  {
+    "name": "監測計畫／強制檢驗 Q&A（115年3月修｜PDF下載）",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=17580&id=f639104906636434473&type=2",
+    "desc": "115年3月修訂之最新Q&A問答集，發布日期2026-03-30；連結直接指向食藥署官方PDF檔案，可開啟或下載。"
+  },
+  {
+    "name": "應設置實驗室 QA（115/5/28）",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=44256&id=f639156482191244625&type=2",
+    "desc": "自設實驗室類別、規模與實施日期。"
+  },
+  {
+    "name": "應置衛生管理人員修正公告",
+    "url": "https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=25069",
+    "desc": "指定食品製造工廠類別及規模。"
+  },
+  {
+    "name": "應置專門職業或技術人員 Q&A",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f638229434035027998",
+    "desc": "專門職業／技術證照人員適用類別與管理原則。"
+  },
+  {
+    "name": "115/3/17 HACCP公告清單",
+    "url": "https://www.fda.gov.tw/TC/news.aspx?cid=3&op=5&pn=6",
+    "desc": "乳品、肉類、水產及低酸性／酸化食品等最新HACCP修正公告入口。"
+  },
+  {
+    "name": "食品業者投保產品責任保險",
+    "url": "https://www.fda.gov.tw/tc/newscontent.aspx?cid=3&id=27328",
+    "desc": "現行投保對象、登記規模、最低保險金額及施行日期。"
+  },
+  {
+    "name": "113/4/25 食品追溯追蹤公告",
+    "url": "https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=30519",
+    "desc": "現行應建立追溯追蹤系統之業者類別、規模與實施日期。"
+  },
+  {
+    "id": "hm-law",
+    "name": "食品製造工廠衛生管理人員設置辦法（現行全文）",
+    "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0040005",
+    "desc": "108年4月9日修正；核對第4至8條。第5條現行為120小時。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "hm-qa",
+    "name": "TFDA 衛生管理人員宣導簡報與QA",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=39694&id=f637777564714512614&type=2",
+    "desc": "衛生管理人員資格路徑與核備說明；條文優先。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "hm-major-guidance",
+    "name": "TFDA 第4條第1款相關科系之大專院校學科標準分類",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=39696&id=f637777565828206634&type=2",
+    "desc": "109年6月19日；列舉科系及所屬學類，不將整個學類所有系所視為無條件認定。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "hm-vocational-guidance",
+    "name": "TFDA 第6條資格說明",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?cid=39695&id=f637777565418569895&type=2",
+    "desc": "109年6月11日；含自學進修鑑定考試說明。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "moe-bcode",
+    "name": "教育部學科標準分類查詢（第5次修正）",
+    "url": "https://stats.moe.gov.tw/bcode/",
+    "desc": "以學類4碼及細學類5碼核對；網站使用已驗證快照，不向教育部即時查詢。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "moe-bcode-file",
+    "name": "教育部學科標準分類第5次修正架構",
+    "url": "https://stats.moe.gov.tw/files/bcode/10609_2系統架構.xlsx",
+    "desc": "93學類與174細學類名稱／代碼。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "moe-year",
+    "name": "教育部114學年度學校基本統計資訊",
+    "url": "https://depart.moe.edu.tw/ed4500/News_Content.aspx?n=5A930C32CC6C3818&sms=91B3AAE8C6388B96&s=840CB94F5D178717",
+    "desc": "115年1月29日公布之114（2025–2026）學年度資料。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "moe-students",
+    "name": "教育部114學年度大專校院各校科系別學生數",
+    "url": "https://stats.moe.gov.tw/files/detail/114/114_students.xlsx",
+    "desc": "保留各校實際科系名稱及科系代碼，去除學生人數，合併相同校系的學制紀錄。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "moe-vocational",
+    "name": "教育部114學年度高級中等學校科別資料與群科代碼表",
+    "url": "https://stats.moe.gov.tw/files/detail/114/114_base2.xlsx",
+    "desc": "使用專業群科／進修部；科別代碼不是大專學類碼。第6條只採指定科別名稱，其他學程不自動等同。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-meat",
+    "name": "肉類加工食品業 HACCP 修正規定（115年3月17日）",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092778321102476",
+    "desc": "肉類或雜碎含量50%以上；須工廠登記且食品從業人員5人以上。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-fish",
+    "name": "水產加工食品業 HACCP 修正規定（115年3月17日）",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092670910829306",
+    "desc": "水產動物含量50%以上；須工廠登記且食品從業人員5人以上。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-dairy",
+    "name": "乳品加工食品業 HACCP 現行規定（115年3月17日）",
+    "url": "https://consumer.fda.gov.tw/Law/Detail.aspx?lawid=816&nodeID=518",
+    "desc": "第三點24種乳品範圍；具工廠登記即達規模，包含調味乳50%、發酵乳飲品40%等產品定義。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-thermal",
+    "name": "熱殺菌密閉容器包裝低酸性食品及酸化食品工廠 HACCP 修正規定",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092490157845550",
+    "desc": "115年3月17日；資本額3,000萬元以上，或未達3,000萬元且食品從業人員5人以上。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-oil",
+    "name": "食用油脂工廠 HACCP 規定",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f636935391044833803",
+    "desc": "107年5月1日；依第4點分階段已生效規模判讀。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-egg",
+    "name": "蛋製品工廠 HACCP 規定",
+    "url": "https://consumer.fda.gov.tw/Law/Detail.aspx?lawid=749&nodeID=518",
+    "desc": "107年5月1日；液蛋、乾燥蛋粉、醃製蛋品，依第4點分階段已生效規模判讀。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-meal",
+    "name": "餐盒食品工廠 HACCP 規定",
+    "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f636695190842357716",
+    "desc": "103年8月11日修正；包含盒餐與團膳，工廠規模階段已全部實施。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-rail",
+    "name": "供應鐵路運輸旅客餐盒之食品業 HACCP 規定",
+    "url": "https://www.fda.gov.tw/TC/lawContent.aspx?cid=62&id=3263",
+    "desc": "鐵路運輸業自設或委外產製餐盒；營業、商業、公司或工廠登記。",
+    "lastReviewed": "2026-09-06"
+  },
+  {
+    "id": "haccp-index",
+    "name": "TFDA 食品安全管制系統現行法規清單",
+    "url": "https://www.fda.gov.tw/TC/law.aspx?cid=62&key=食品安全管制系統",
+    "desc": "查核目前公告業別；旅館餐廳等非工廠情境不納入本工廠資格工具。",
+    "lastReviewed": "2026-09-06"
+  }
+]

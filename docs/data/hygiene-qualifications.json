@@ -1,0 +1,33 @@
+{
+  "id": "hygiene-qualifications",
+  "name": "衛生管理人員資格路徑",
+  "version": "2026-09-06",
+  "lastReviewed": "2026-09-06",
+  "effectiveFrom": "2020-07-01",
+  "sourceIds": ["hm-law", "hm-qa", "hm-major-guidance"],
+  "scopeNote": "以須辦理工廠登記之食品製造工廠為查詢前提。本工具列出可選資格路徑，不代表已取得資格或完成核備；是否應設置仍由原應置衛生管理人員模組判讀。",
+  "article7Note": "應實施 HACCP 者須先符合第4條，並符合第7條附加資格；第5條或第6條本身不能替代第4條。證照不能免除第4條資格。",
+  "educationNote": "考試及證照路徑的學歷欄僅表示查詢情境，法條未另外要求專科以上或高職畢業；仍須符合該項考試資格。",
+  "licenses": [
+    {"id":"food-technologist","name":"食品技師證書","examName":"食品技師高等考試及格證明","article7":true},
+    {"id":"animal-husbandry","name":"畜牧技師證書","examName":"畜牧技師高等考試及格證明","article7":true},
+    {"id":"veterinarian","name":"獸醫師證書","examName":"獸醫師高等考試及格證明","article7":true},
+    {"id":"aquaculture","name":"水產養殖技師證書","examName":"水產養殖技師高等考試及格證明","article7":true},
+    {"id":"dietitian","name":"營養師證書","examName":"營養師高等考試及格證明","article7":true},
+    {"id":"chinese-cook-b","name":"中餐烹調乙級技術士證","article7":false}
+  ],
+  "capitalOptions":[{"id":"under30m","name":"未達3,000萬"},{"id":"atLeast30m","name":"3,000萬以上"}],
+  "educationOptions":["專科以上","高職"],
+  "haccpLabels":{"required":"應實施 HACCP","notRequired":"非屬應實施 HACCP"},
+  "supplements":[
+    {"id":"haccp60","name":"HACCP 訓練60小時以上","article":"第7條第1項第1款","documentIds":["haccp60"],"licenseRequired":false},
+    {"id":"haccp30","name":"指定證書及 HACCP 訓練30小時以上","article":"第7條第1項第2款","documentIds":["license","haccp30"],"licenseRequired":true}
+  ],
+  "routes":[
+    {"id":"a4-degree","article":"第4條第1款","kind":"degree","education":["專科以上"],"capital":["under30m","atLeast30m"],"haccp":[true,false],"label":"相關科系畢業","summary":"符合第4條第1款","conditions":["公立或政府立案私立專科以上學校，或教育部承認之國外專科以上學校，食品、營養、家政、生活應用科學、畜牧、獸醫、化學、化工、農業化學、生物化學、生物、藥學、公共衛生等相關科系所畢業。","科系須依官方學類與實際學籍核對；學校名稱僅協助辨識系所。"],"documentIds":["degree"]},
+    {"id":"a4-high-exam","article":"第4條第2款","kind":"exam","education":["專科以上","高職"],"capital":["under30m","atLeast30m"],"haccp":[true,false],"label":"相關類科高等／相當特考","summary":"符合第4條第2款","conditions":["第4條第1款科系所相關類科之高等考試，或相當於高等考試之特種考試及格。","學歷情境不取代相關類科考試及格資格。"],"documentIds":["highExam"]},
+    {"id":"a4-ordinary-exam","article":"第4條第3款","kind":"exam","education":["專科以上","高職"],"capital":["under30m","atLeast30m"],"haccp":[true,false],"label":"相關類科普考／丙等特考及工作經歷","summary":"符合第4條第3款","conditions":["第4條第1款科系所相關類科之普通考試，或相當於普通考試之丙等特種考試及格。","從事食品或食品添加物製造相關工作3年以上，持有證明。"],"documentIds":["ordinaryExam","work3"]},
+    {"id":"a5-cook","article":"第5條","kind":"license","education":["專科以上","高職"],"capital":["under30m","atLeast30m"],"haccp":[false],"industryTag":"kitchen","licenseId":"chinese-cook-b","label":"中餐烹調乙級技術士","summary":"符合第5條","conditions":["中央廚房食品工廠或餐盒食品工廠。","領有中餐烹調乙級技術士證，接受衛生講習120小時以上，持有中央主管機關認可之食品衛生相關機構核發之證明文件。"],"documentIds":["license","hygiene120"]},
+    {"id":"a6-vocational","article":"第6條","kind":"vocational","education":["高職"],"capital":["under30m"],"haccp":[false],"label":"指定高職科別及工作經歷","summary":"符合第6條","conditions":["資本額未達新臺幣3,000萬元。","公立或經政府立案之私立高級職業學校第6條指定科別畢業。","於同一事業主體之食品或食品添加物製造工廠，從事製造或製程品質管制業務4年以上，持有證明。","持有中央主管機關認可之訓練機關（構）核發之 HACCP 訓練60小時以上證明。"],"documentIds":["vocationalDegree","work4","haccp60"]}
+  ]
+}
