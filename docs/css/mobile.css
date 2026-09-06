@@ -113,3 +113,5 @@
   .hygiene-detail{font-size:14px}
   .tool-table a{overflow-wrap:anywhere}
 }
+
+@media(max-width:720px){.qualification-choice{min-height:44px;align-items:center}.detail-select select{font-size:16px;min-height:44px}}

@@ -1,7 +1,7 @@
 {
   "id": "hygiene-qualifications",
   "name": "衛生管理人員資格路徑",
-  "version": "2026-09-06",
+  "version": "2026-09-06.2",
   "lastReviewed": "2026-09-06",
   "effectiveFrom": "2020-07-01",
   "sourceIds": ["hm-law", "hm-qa", "hm-major-guidance"],
@@ -23,6 +23,51 @@
     {"id":"haccp60","name":"HACCP 訓練60小時以上","article":"第7條第1項第1款","documentIds":["haccp60"],"licenseRequired":false},
     {"id":"haccp30","name":"指定證書及 HACCP 訓練30小時以上","article":"第7條第1項第2款","documentIds":["license","haccp30"],"licenseRequired":true}
   ],
+  "resultGroups":[
+  {
+    "id": "general",
+    "name": "一般資格",
+    "routeIds": [
+      "a4-degree",
+      "a4-high-exam",
+      "a4-ordinary-exam"
+    ],
+    "summaries": {
+      "required": "符合第4條及第7條",
+      "notRequired": "符合第4條"
+    },
+    "basis": {
+      "required": "第4條、第7條",
+      "notRequired": "第4條"
+    }
+  },
+  {
+    "id": "cook",
+    "name": "其他資格",
+    "routeIds": [
+      "a5-cook"
+    ],
+    "summaries": {
+      "notRequired": "符合第5條"
+    },
+    "basis": {
+      "notRequired": "第5條"
+    }
+  },
+  {
+    "id": "vocational",
+    "name": "高職資格",
+    "routeIds": [
+      "a6-vocational"
+    ],
+    "summaries": {
+      "notRequired": "符合第6條"
+    },
+    "basis": {
+      "notRequired": "第6條"
+    }
+  }
+],
   "routes":[
     {"id":"a4-degree","article":"第4條第1款","kind":"degree","education":["專科以上"],"capital":["under30m","atLeast30m"],"haccp":[true,false],"label":"相關科系畢業","summary":"符合第4條第1款","conditions":["公立或政府立案私立專科以上學校，或教育部承認之國外專科以上學校，食品、營養、家政、生活應用科學、畜牧、獸醫、化學、化工、農業化學、生物化學、生物、藥學、公共衛生等相關科系所畢業。","科系須依官方學類與實際學籍核對；學校名稱僅協助辨識系所。"],"documentIds":["degree"]},
     {"id":"a4-high-exam","article":"第4條第2款","kind":"exam","education":["專科以上","高職"],"capital":["under30m","atLeast30m"],"haccp":[true,false],"label":"相關類科高等／相當特考","summary":"符合第4條第2款","conditions":["第4條第1款科系所相關類科之高等考試，或相當於高等考試之特種考試及格。","學歷情境不取代相關類科考試及格資格。"],"documentIds":["highExam"]},

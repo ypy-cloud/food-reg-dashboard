@@ -69,6 +69,20 @@ function queryQualifications(data,query={}){
   }
   return {rows,majors,error:'',unknownIndustry:industries.some(i=>i.id==='unknown')};
 }
+// Group presentation only; each option retains its original qualification and documents.
+function groupQualifications(data,rows){
+  const groups=new Map();
+  for(const row of rows){
+    const type=data.qualifications.resultGroups.find(g=>g.routeIds.includes(row.route.id));
+    const id=[row.industry.id,row.scenario.id,row.capital,type.id].join(':');
+    if(!groups.has(id)) groups.set(id,{...row,id,type,summary:type.summaries[row.scenario.haccp?'required':'notRequired'],basis:type.basis[row.scenario.haccp?'required':'notRequired'],options:[]});
+    const group=groups.get(id);
+    // Education scenarios do not create a second copy of the same exam route.
+    const key=r=>[r.route.id,r.supplement?.id,r.license?.id].join(':');
+    if(!group.options.some(r=>key(r)===key(row))) group.options.push(row);
+  }
+  return [...groups.values()];
+}
 function requiredDocuments(data,row){
   const names=row.majors.filter(m=>m.education==='高職'&&data.majorPolicy.vocationalMajors.includes(m.major)).map(m=>m.major);
   const majors=[...new Set(names.length?names:data.majorPolicy.vocationalMajors)];
@@ -79,5 +93,5 @@ function requiredDocuments(data,row){
   });
   return data.documents.base.map(doc=>({...doc,items:doc.dynamic?proofs:[]}));
 }
-return {normalize,classify,searchMajors,queryQualifications,requiredDocuments};
+return {normalize,classify,searchMajors,queryQualifications,groupQualifications,requiredDocuments};
 });

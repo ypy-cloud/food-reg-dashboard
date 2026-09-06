@@ -55,3 +55,18 @@ test('school, class name and code search combine and preserve status/source/date
  const vocational=engine.classify({education:'高職',major:'資訊科'},data.majorPolicy);assert.equal(vocational.status,'不符合');
 });
 
+
+test('grouped scenarios preserve routes and documents without duplicate education/license rows',()=>{
+ const raw=query({industry:'肉類'}),groups=engine.groupQualifications(data,raw);
+ assert.equal(groups.length,5);
+ const small=engine.groupQualifications(data,query({industry:'肉類',capital:'under30m'}));assert.equal(small.length,3);
+ const required=small.find(g=>g.scenario.haccp);
+ assert.equal(required.options.length,18);
+ assert.deepEqual(new Set(required.options.map(r=>r.route.id)),new Set(['a4-degree','a4-high-exam','a4-ordinary-exam']));
+ assert.equal(small.find(g=>g.type.id==='vocational').summary,'符合第6條');
+ // Every underlying document combination remains reachable after presentation grouping.
+ const signature=r=>JSON.stringify([r.industry.id,r.scenario.id,r.capital,r.route.id,engine.requiredDocuments(data,r)]);
+ assert.deepEqual(new Set(groups.flatMap(g=>g.options).map(signature)),new Set(raw.map(signature)));
+ for(const g of engine.groupQualifications(data,query({industry:'肉類',education:'高職'})))assert(g.options.every(r=>r.route.kind!=='degree'));
+ const cook=engine.groupQualifications(data,query({industry:'中央廚房'})).find(g=>g.type.id==='cook');assert(cook);assert(cook.options.every(r=>!r.scenario.haccp));
+});
