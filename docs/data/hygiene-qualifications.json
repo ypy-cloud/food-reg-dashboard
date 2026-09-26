@@ -9,7 +9,7 @@
     "hm-qa",
     "hm-major-guidance"
   ],
-  "scopeNote": "以須辦理工廠登記之食品製造工廠為前提。業別固定依衛生管理人員公告的九個具名業別及「其他食品製造業」選取；科系可獨立查詢，HACCP只在特定公告業別與條件下顯示。",
+  "scopeNote": "以須辦理工廠登記之食品製造工廠為前提。業別依衛生管理人員公告分類選取；選擇即食餐食業會一併顯示中央廚房與餐盒食品工廠情境，選擇其他食品製造業會一併顯示已建置之 HACCP 特定業別情境。科系可獨立查詢。",
   "article7Note": "屬食安法第8條第2項公告指定應實施HACCP之食品業者時，衛生管理人員除須符合第4條外，並須符合第7條附加資格。",
   "educationNote": "考試及證照路徑的學歷欄僅表示查詢情境，法條未另外要求專科以上或高職畢業；仍須符合該項考試資格。",
   "licenses": [
@@ -96,24 +96,10 @@
   ],
   "resultGroups": [
     {
-      "id": "degree",
-      "name": "專科以上",
+      "id": "article4",
+      "name": "專科以上／考試資格",
       "routeIds": [
-        "a4-degree"
-      ],
-      "summaries": {
-        "required": "符合第4條及第7條",
-        "notRequired": "符合第4條"
-      },
-      "basis": {
-        "required": "第4條、第7條",
-        "notRequired": "第4條"
-      }
-    },
-    {
-      "id": "exam",
-      "name": "考試資格",
-      "routeIds": [
+        "a4-degree",
         "a4-high-exam",
         "a4-ordinary-exam"
       ],
