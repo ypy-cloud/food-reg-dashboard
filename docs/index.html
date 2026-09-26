@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260926-hm-detail-and">
-<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-detail-and">
+<link rel="stylesheet" href="css/style.css?v=20260926-hm-route-select">
+<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-route-select">
 </head>
 <body>
 <div class="app-shell">
@@ -45,18 +45,13 @@
       <div class="hygiene-main">
         <form class="panel query-panel" id="qualificationForm">
           <h3 class="panel-title">查詢條件</h3>
-          <div class="hygiene-primary-query">
+          <div class="query-grid hygiene-filter-grid">
             <label class="field"><span>業別</span><select id="hmIndustry"><option value="">請選擇業別</option></select></label>
+            <label class="field"><span>學歷／資格</span><select id="hmQualification"><option value="">全部</option></select></label>
+            <label class="field"><span>證照</span><select id="hmLicense"><option value="">全部</option></select></label>
+            <label class="field"><span>資本額</span><select id="hmCapital"><option value="">全部</option></select></label>
           </div>
-          <div class="advanced-search advanced-search-open" id="hmAdvanced">
-            <div class="advanced-search-title">更多條件 <span id="hmAdvancedCount"></span></div>
-            <div class="query-grid hygiene-advanced-grid">
-              <label class="field"><span>學歷</span><select id="hmEducation"><option value="">全部</option></select></label>
-              <label class="field"><span>證照</span><select id="hmLicense"><option value="">全部</option></select></label>
-              <label class="field"><span>資本額</span><select id="hmCapital"><option value="">全部</option></select></label>
-            </div>
-          </div>
-          <p class="tool-note">請先選擇業別；學歷、證照及資本額可用來縮小結果。科系與學類請使用「相關科系／學類代碼查詢」。</p>
+          <p class="tool-note">請先選擇業別；學歷／資格、證照及資本額會以同時符合的條件縮小結果。科系與學類請使用「相關科系／學類代碼查詢」。</p>
           <div class="query-actions"><button class="btn secondary" type="reset">清除條件</button><button class="btn primary" type="submit" id="hmSearch" disabled>查詢</button></div>
         </form>
         <div class="active-query" id="hmActiveConditions" hidden aria-live="polite"></div>
@@ -235,8 +230,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260926-hm-detail-and" defer></script>
-<script src="js/hygiene-ui.js?v=20260926-hm-detail-and" defer></script>
+<script src="js/hygiene-manager.js?v=20260926-hm-route-select" defer></script>
+<script src="js/hygiene-ui.js?v=20260926-hm-route-select" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>
