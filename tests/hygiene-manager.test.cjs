@@ -108,7 +108,7 @@ test('vocational conditions use all named majors but document title stays generi
  const group=groups.find(g=>g.type.id==='vocational');assert(group);
  const docs=engine.requiredDocuments(data,group.options[0]);
  const proofs=docs.find(x=>x.id==='qualifications').items;
- assert(proofs.includes('高職指定科別畢業證書'));assert(!proofs.some(x=>x.includes('食品科、')));
+ assert(proofs.includes('高職第6條指定或函釋認定科別畢業證書'));assert(!proofs.some(x=>x.includes('食品科、')));
  assert(proofs.some(x=>x.includes('4年以上')));assert(proofs.some(x=>x.includes('60小時')));
 });
 
@@ -188,4 +188,27 @@ test('all current higher-education TFDA names are checked through the candidate 
  assert(matched.some(r=>r.major==='食品安全管理碩士在職學位學程'&&r.tfdaMajorName==='食品安全管理'));
  assert(matched.some(r=>r.major==='食品科技科'&&r.tfdaMajorName==='食品科技'));
  assert(matched.some(r=>r.major==='食品營養博士學位學程'&&r.tfdaMajorName==='食品營養'));
+});
+
+
+test('餐飲技術科函釋認定與原第6條15科分開保存',()=>{
+ assert.equal(data.majorPolicy.vocationalMajors.length,15);
+ assert(!data.majorPolicy.vocationalMajors.includes('餐飲技術科'));
+ const item=data.majorPolicy.vocationalInterpretations.find(x=>x.major==='餐飲技術科');
+ assert(item);
+ assert.equal(item.basis,'FDA 食字第1090019307號函');
+ const classified=engine.classify({education:'高職',major:'餐飲技術科'},data.majorPolicy);
+ assert.equal(classified.status,'符合');
+ assert.equal(classified.article,'第6條（函釋認定）');
+ assert.equal(classified.vocationalInterpretation?.major,'餐飲技術科');
+});
+
+test('第6條函釋科別仍使用完整工作經歷與HACCP文件組合',()=>{
+ const groups=engine.groupQualifications(data,query({industry:'其他食品製造業',qualificationType:'vocational',capital:'under30m'}));
+ const group=groups.find(g=>g.type.id==='vocational');assert(group);
+ const docs=engine.requiredDocuments(data,group.options[0]);
+ const proofs=docs.find(x=>x.id==='qualifications').items;
+ assert(proofs.includes('高職第6條指定或函釋認定科別畢業證書'));
+ assert(proofs.some(x=>x.includes('4年以上')));
+ assert(proofs.some(x=>x.includes('60小時')));
 });
