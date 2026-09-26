@@ -29,18 +29,55 @@ function paginate(rows,page,target){
   return rows.slice(start,start+state.size);
 }
 function cell(label,html){return `<td data-label="${esc(label)}"><div>${html}</div></td>`;}
+function industryHtml(r){
+  const primary=r.industry.managerCategory||r.industry.name;
+  const secondary=r.industry.name!==primary?r.industry.name:'';
+  return `<strong>${esc(primary)}</strong>${secondary?`<br><span class="tool-note">${esc(secondary)}</span>`:''}`;
+}
 function renderQualifications(){
   $('#hmCount').textContent=`（共 ${state.rows.length} 筆情境）`;
   $('#hmRows').innerHTML=paginate(state.rows,state.page,'hm').map(r=>`<tr class="${r.id===state.selected?'selected':''}">`+
-    cell('業別',esc(r.industry.name))+
-    cell('資格類型',`<strong>${esc(r.type.name)}</strong>${r.majorStatus?`<br><span class="status active">科系：${esc(r.majorStatus)}</span>`:''}`)+
+    cell('業別',industryHtml(r))+
+    cell('資格路徑',`<strong>${esc(r.type.name)}</strong>${r.majorStatus?`<br><span class="status active">科系：${esc(r.majorStatus)}</span>`:''}`)+
     cell('資本額條件',esc(r.capitalLabel))+
     cell('HACCP 情境',`<strong>${esc(r.haccpLabel)}</strong>`)+
-    cell('主要資格條件摘要',esc(r.summary))+
+    cell('主要資格條件',esc(r.summary))+
     cell('法源',esc(r.basis))+
     cell('操作',`<button type="button" class="btn document-btn" data-result="${esc(r.id)}">應備文件</button>`)+ '</tr>').join('')||'<tr><td class="empty-cell" colspan="7">沒有符合條件的情境</td></tr>';
 }
 function clearDetail(){state.selected='';$('#hmDetail').className='detail-empty';$('#hmDetail').textContent='請點選任一結果的「應備文件」。';}
+function qualificationsQuery(){return {industry:$('#hmIndustry').value,major:$('#hmMajor').value,school:$('#hmSchool').value,education:$('#hmEducation').value,license:$('#hmLicense').value,capital:$('#hmCapital').value};}
+function renderActiveConditions(){
+  const q=qualificationsQuery();
+  const labels={industry:'業別',major:'科系',school:'學校',education:'學歷',license:'證照',capital:'資本額'};
+  const values={...q};
+  if(q.license) values.license=state.data.qualifications.licenses.find(x=>x.id===q.license)?.name||q.license;
+  if(q.capital) values.capital=state.data.qualifications.capitalOptions.find(x=>x.id===q.capital)?.name||q.capital;
+  const entries=Object.entries(values).filter(([,v])=>v);
+  const box=$('#hmActiveConditions');
+  box.hidden=!entries.length;
+  box.innerHTML=entries.length?`<strong>目前查詢條件</strong><div class="active-query-chips">${entries.map(([k,v])=>`<button type="button" class="query-chip" data-clear="${k}" title="移除${esc(labels[k])}條件">${esc(labels[k])}：${esc(v)} ×</button>`).join('')}</div><button type="button" class="text-link clear-all-query" data-clear-all>清除全部</button>`:'';
+}
+function updateAdvancedCount(){
+  const count=[$('#hmSchool').value,$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
+  $('#hmAdvancedCount').textContent=count?`（已使用 ${count} 項）`:'';
+}
+function buildIndustrySuggestions(){
+  const values=[];
+  for(const i of state.data.industries.industries) values.push(i.managerCategory,i.name,...(i.aliases||[]));
+  $('#hmIndustryOptions').innerHTML=[...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-Hant')).map(v=>`<option value="${esc(v)}"></option>`).join('');
+}
+function buildMajorSuggestions(){
+  const q=$('#hmMajor').value.trim();
+  if(!q){$('#hmMajorOptions').innerHTML='';return;}
+  const seen=new Set(), options=[];
+  for(const r of state.data.majors.records){
+    if(engine.normalize(r.major).includes(engine.normalize(q))&&!seen.has(r.major)){
+      seen.add(r.major);options.push(r.major);if(options.length>=12) break;
+    }
+  }
+  $('#hmMajorOptions').innerHTML=options.map(v=>`<option value="${esc(v)}"></option>`).join('');
+}
 function showDetail(group,choice={},focus=true){
   state.selected=group.id;
   const unique=(items,key)=>[...new Map(items.map(item=>[key(item),item])).values()];
@@ -57,7 +94,7 @@ function showDetail(group,choice={},focus=true){
   const vocational=choice.vocational||(vocationalNames.length===1?vocationalNames[0]:'');
   const documentRow=vocational?{...row,majors:[{education:'高職',major:vocational}]}:row;
   const docList=engine.requiredDocuments(data,documentRow);
-  const selectors=`<fieldset class="qualification-options"><legend>符合下列任一資格</legend>${routes.map(r=>`<label class="qualification-choice"><input type="radio" name="detailRoute" value="${esc(r.route.id)}" ${r.route.id===row.route.id?'checked':''}><span>${r.route.kind==='degree'?esc(r.education)+' ':''}${esc(r.route.label)}</span></label>`).join('')}</fieldset>`+
+  const selectors=`<fieldset class="qualification-options"><legend>可採用的資格路徑</legend>${routes.map(r=>`<label class="qualification-choice"><input type="radio" name="detailRoute" value="${esc(r.route.id)}" ${r.route.id===row.route.id?'checked':''}><span>${r.route.kind==='degree'?esc(r.education)+' ':''}${esc(r.route.label)}</span></label>`).join('')}</fieldset>`+
     (supplements.length?`<fieldset class="qualification-options"><legend>HACCP 附加資格（擇一）</legend>${supplements.map(r=>`<label class="qualification-choice"><input type="radio" name="detailSupplement" value="${esc(r.supplement.id)}" ${r.supplement.id===row.supplement.id?'checked':''}><span>${esc(r.supplement.name)}</span></label>`).join('')}</fieldset>`:'')+
     (row.supplement?.licenseRequired?`<label class="field detail-select"><span>證照名稱</span><select id="detailLicense">${options.map(r=>`<option value="${esc(r.license.id)}" ${r.license.id===row.license.id?'selected':''}>${esc(r.license.name)}</option>`).join('')}</select></label>`:'')+
     (row.route.kind==='vocational'?`<label class="field detail-select"><span>高職指定科別</span><select id="detailVocational"><option value="">請選擇指定科別</option>${vocationalOptions.map(name=>`<option ${name===vocational?'selected':''}>${esc(name)}</option>`).join('')}</select></label>`:'');
@@ -68,9 +105,12 @@ function showDetail(group,choice={},focus=true){
   const majorNote=row.query.major?`<p>輸入科系：${esc(row.query.major)}${row.query.school?'／'+esc(row.query.school):''}。${row.majorStatus?'科系判讀：'+esc(row.majorStatus)+'。':'此為考試／證照路徑，科系輸入不能代替考試或證照證明。'}</p>`:'';
   const matches=row.majors.slice(0,6).map(m=>`<li>${esc(m.school)}／${esc(m.major)}：${esc(m.classCode||m.departmentCode||'法定科別')} ${esc(m.className)}（${esc(m.status)}）</li>`).join('');
   const missing=row.query.major&&!row.majors.length&&(row.route.kind==='degree'||row.route.kind==='vocational')?'<p class="tool-caution">未找到可核對的校系紀錄；以下為待確認的資格路徑與文件，不表示輸入科系已符合。</p>':'';
+  const primary=row.industry.managerCategory||row.industry.name;
+  const specific=row.industry.name!==primary?`<br><span class="tool-note">查詢產品／情境：${esc(row.industry.name)}</span>`:'';
+  const article5=row.industry.tags.includes('kitchen')?`<div class="tool-caution"><strong>中央廚房／餐盒另有第5條資格條件：</strong>領有中餐烹調乙級技術士證，並接受衛生講習120小時以上者，法規另列可擔任資格。${row.scenario.haccp?' 本情境屬應實施HACCP時，第7條仍明定須符合第4條並具HACCP附加資格。':''}</div>`:'';
   $('#hmDetail').className='hygiene-detail';
-  $('#hmDetail').innerHTML=`<section><h3>適用情境</h3><p><strong>${esc(row.industry.name)}</strong><br>${esc(group.type.name)}／${esc(row.capitalLabel)}<br>${esc(row.haccpLabel)}</p><p>${esc(row.scenario.condition)}</p>${row.industry.note?`<p class="tool-caution">${esc(row.industry.note)}</p>`:''}${majorNote}${missing}</section>`+
-    `<section><h3>資格條件</h3>${selectors}<details class="selected-conditions"><summary>所選路徑的完整資格條件</summary><ul>${conditions.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>${matches?`<details><summary>符合搜尋條件的科系紀錄（${row.majors.length} 筆）</summary><ul>${matches}</ul>${row.majors.length>6?'<p>完整紀錄可於學類代碼頁籤查詢。</p>':''}</details>`:''}</section>`+
+  $('#hmDetail').innerHTML=`<section><h3>適用情境</h3><p><strong>${esc(primary)}</strong>${specific}<br>${esc(group.type.name)}／${esc(row.capitalLabel)}<br>${esc(row.haccpLabel)}</p><p>${esc(row.industry.managerCondition||'')}</p><p>${esc(row.scenario.condition)}</p>${row.industry.note?`<p class="tool-caution">${esc(row.industry.note)}</p>`:''}${majorNote}${missing}</section>`+
+    `<section><h3>資格條件</h3>${selectors}${article5}<details class="selected-conditions"><summary>所選路徑的完整資格條件</summary><ul>${conditions.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>${matches?`<details><summary>符合搜尋條件的科系紀錄（${row.majors.length} 筆）</summary><ul>${matches}</ul>${row.majors.length>6?'<p>完整紀錄可於學類代碼頁籤查詢。</p>':''}</details>`:''}</section>`+
     `<section><h3>應備文件</h3><ol class="document-list" aria-live="polite">${docList.map(d=>`<li>${esc(d.name)}${d.items.length?`<ul>${d.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ol></section>`+
     `<section><h3>法源依據／官方來源</h3><p>食品製造工廠衛生管理人員設置辦法 ${esc(row.basis)}；第8條。</p>${sourcesHtml([...data.qualifications.sourceIds,...row.industry.sourceIds,...majorSources,...(row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[])])}<p class="tool-note">最後確認：${esc(data.qualifications.lastReviewed)}</p></section>`;
   renderQualifications();
@@ -83,10 +123,10 @@ function showDetail(group,choice={},focus=true){
   if(focus){$('#hmDetailPanel').focus({preventScroll:true});
     if(window.matchMedia('(max-width:1120px)').matches) $('#hmDetailPanel').scrollIntoView({behavior:'smooth',block:'start'});}
 }
-function qualificationsQuery(){return {industry:$('#hmIndustry').value,major:$('#hmMajor').value,school:$('#hmSchool').value,education:$('#hmEducation').value,license:$('#hmLicense').value,capital:$('#hmCapital').value};}
 function runQualifications(){
-  const result=engine.queryQualifications(state.data,qualificationsQuery());state.rows=engine.groupQualifications(state.data,result.rows);state.page=1;clearDetail();renderQualifications();
-  $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對學歷、科系、證照或資本額條件。':result.unknownIndustry?'業別尚待確認；請逐筆核對適用範圍後再選擇情境。':'請點「應備文件」核對產品及人數門檻，再於詳細內容選擇個人資格與訓練方式；文件隨選擇更新。');
+  const result=engine.queryQualifications(state.data,qualificationsQuery());
+  state.rows=engine.groupQualifications(state.data,result.rows);state.page=1;clearDetail();renderQualifications();renderActiveConditions();updateAdvancedCount();
+  $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對業別、科系或更多條件。':result.unknownIndustry?'業別尚待確認；先顯示可判讀的人員資格，HACCP須待業別確認後再判定。':'已依目前條件列出可能情境；點「應備文件」查看資格細節與文件。');
 }
 function renderMajors(){
   $('#mcCount').textContent=`（共 ${state.majors.length} 筆）`;
@@ -121,10 +161,21 @@ async function init({manifest,sources,loadJson}){
     for(const value of data.qualifications.educationOptions) $('#hmEducation').insertAdjacentHTML('beforeend',`<option value="${esc(value)}">${esc(value)}</option>`);
     for(const value of data.qualifications.licenses) $('#hmLicense').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     for(const value of data.qualifications.capitalOptions) $('#hmCapital').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
+    buildIndustrySuggestions();
     $('#hmSearch').disabled=false;$('#mcSearch').disabled=false;
     $('#qualificationForm').addEventListener('submit',e=>{e.preventDefault();runQualifications();});
-    $('#qualificationForm').addEventListener('reset',()=>{state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmMessage').textContent='請輸入業別或科系開始查詢。';});
-    $('#qualificationForm').addEventListener('input',()=>{if(state.rows.length){state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmMessage').textContent='條件已變更，請重新查詢。';}});
+    $('#qualificationForm').addEventListener('reset',()=>{setTimeout(()=>{state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmMessage').textContent='請輸入業別或科系開始查詢。';$('#hmActiveConditions').hidden=true;$('#hmActiveConditions').innerHTML='';$('#hmAdvanced').open=false;updateAdvancedCount();},0);});
+    $('#qualificationForm').addEventListener('input',()=>{updateAdvancedCount();if(state.rows.length){state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmActiveConditions').hidden=true;$('#hmMessage').textContent='條件已變更，請重新查詢。';}});
+    $('#hmMajor').addEventListener('input',buildMajorSuggestions);
+    $('#hmActiveConditions').addEventListener('click',e=>{
+      const b=e.target.closest('[data-clear],[data-clear-all]');if(!b)return;
+      if(b.hasAttribute('data-clear-all')) $('#qualificationForm').reset();
+      else{
+        const map={industry:'#hmIndustry',major:'#hmMajor',school:'#hmSchool',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
+        $(map[b.dataset.clear]).value='';
+        if($('#hmIndustry').value||$('#hmMajor').value) runQualifications(); else $('#qualificationForm').reset();
+      }
+    });
     $('#majorForm').addEventListener('submit',e=>{e.preventDefault();runMajors();});
     $('#majorForm').addEventListener('reset',()=>{state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='請重新輸入條件查詢。';});
     $('#majorForm').addEventListener('input',()=>{if(state.majors.length){state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='條件已變更，請重新查詢。';}});
