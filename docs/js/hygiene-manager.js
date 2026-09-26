@@ -43,6 +43,12 @@ function resolveIndustries(data,industryName){
   return choice.profileIds.map(id=>data.industries.industries.find(i=>i.id===id)).filter(Boolean);
 }
 
+function routeMatchesQualification(route,qualificationType,data){
+  if(!qualificationType) return true;
+  const group=data.qualifications.resultGroups.find(g=>g.routeIds.includes(route.id));
+  return group?.id===qualificationType;
+}
+
 function routeMatchesLicense(route,scenario,licenseId,data){
   if(!licenseId) return true;
   const license=data.qualifications.licenses.find(l=>l.id===licenseId);
@@ -62,11 +68,10 @@ function queryQualifications(data,query={}){
   for(const currentIndustry of industries) for(const scenario of currentIndustry.scenarios) for(const route of data.qualifications.routes){
     if(!route.haccp.includes(scenario.haccp)) continue;
     if(route.industryTag&&!currentIndustry.tags.includes(route.industryTag)) continue;
+    if(!routeMatchesQualification(route,q.qualificationType,data)) continue;
     if(!routeMatchesLicense(route,scenario,q.license,data)) continue;
 
     for(const education of route.education){
-      if(q.education&&q.education!==education) continue;
-
       for(const capital of route.capital){
         if(!scenario.capital.includes(capital)||(q.capital&&capital!==q.capital)) continue;
 
@@ -121,10 +126,11 @@ function groupQualifications(data,rows){
 
 function proofItemsForRow(data,row,{includeSupplement=true}={}){
   const ids=[...row.route.documentIds,...(includeSupplement?(row.supplement?.documentIds||[]):[])];
+  const effectiveLicense=row.license||data.qualifications.licenses.find(l=>l.id===row.route.licenseId)||null;
   return [...new Set(ids)].map(id=>{
-    if(id==='highExam'&&row.license?.examName) return row.license.examName+'（或'+row.license.name+'）';
-    return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',row.license?.name||'');
-  });
+    if(id==='highExam'&&effectiveLicense?.examName) return effectiveLicense.examName+'（或'+effectiveLicense.name+'）';
+    return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',effectiveLicense?.name||'');
+  }).filter(Boolean);
 }
 
 function requiredDocuments(data,row){
@@ -162,7 +168,7 @@ function requiredDocumentsForGroup(data,group){
 }
 
 return {
-  normalize,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesLicense,
+  normalize,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesQualification,routeMatchesLicense,
   queryQualifications,groupQualifications,requiredDocuments,requiredDocumentsForGroup
 };
 });
