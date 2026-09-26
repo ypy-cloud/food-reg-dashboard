@@ -50,15 +50,16 @@ function clearDetail(){state.selected='';$('#hmDetail').className='detail-empty'
 function qualificationsQuery(){
   return {
     industry:$('#hmIndustry').value,
-    education:$('#hmEducation').value,
+    qualificationType:$('#hmQualification').value,
     license:$('#hmLicense').value,
     capital:$('#hmCapital').value
   };
 }
 function renderActiveConditions(){
   const q=qualificationsQuery();
-  const labels={industry:'業別',education:'學歷',license:'證照',capital:'資本額'};
+  const labels={industry:'業別',qualificationType:'學歷／資格',license:'證照',capital:'資本額'};
   const values={...q};
+  if(q.qualificationType) values.qualificationType=state.data.qualifications.qualificationOptions.find(x=>x.id===q.qualificationType)?.name||q.qualificationType;
   if(q.license) values.license=state.data.qualifications.licenses.find(x=>x.id===q.license)?.name||q.license;
   if(q.capital) values.capital=state.data.qualifications.capitalOptions.find(x=>x.id===q.capital)?.name||q.capital;
   const entries=Object.entries(values).filter(([,v])=>v);
@@ -66,25 +67,29 @@ function renderActiveConditions(){
   box.hidden=!entries.length;
   box.innerHTML=entries.length?`<strong>目前查詢條件</strong><div class="active-query-chips">${entries.map(([k,v])=>`<button type="button" class="query-chip" data-clear="${k}" title="移除${esc(labels[k])}條件">${esc(labels[k])}：${esc(v)} ×</button>`).join('')}</div><button type="button" class="text-link clear-all-query" data-clear-all>清除全部</button>`:'';
 }
-function updateAdvancedCount(){
-  const count=[$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
-  $('#hmAdvancedCount').textContent=count?`（已使用 ${count} 項）`:'';
-}
 function buildIndustryOptions(){
   $('#hmIndustry').insertAdjacentHTML('beforeend',state.data.industries.managerCategories.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(''));
 }
-function qualificationConditionsHtml(group,data){
-  const routes=[...new Map(group.options.map(r=>[r.route.id,r])).values()];
+function selectedQualification(group,choice={}){
+  const unique=(items,key)=>[...new Map(items.map(item=>[key(item),item])).values()];
+  const routes=unique(group.options,r=>r.route.id);
+  const routeId=choice.route||routes[0]?.route.id;
+  const routeOptions=group.options.filter(r=>r.route.id===routeId);
+  const supplements=unique(routeOptions.filter(r=>r.supplement),r=>r.supplement.id);
+  const supplementId=choice.supplement||supplements[0]?.supplement.id;
+  const row=routeOptions.find(r=>!r.supplement||r.supplement.id===supplementId)||routeOptions[0]||group.options[0]||group;
+  return {routes,routeId,routeOptions,supplements,supplementId,row};
+}
+function qualificationControlsHtml(group,selection,data){
+  const {routes,routeId,supplements,supplementId,row}=selection;
   if(group.type.id==='article4'){
-    const routeList=routes.map(row=>`<li><strong>${esc(row.route.label)}</strong><ul>${row.route.conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></li>`).join('');
-    const supplements=[...new Map(group.options.filter(r=>r.supplement).map(r=>[r.supplement.id,r.supplement])).values()];
-    const supplementHtml=supplements.length
-      ?`<div class="qualification-group"><strong>第7條附加資格：另符合以下任一項</strong><ul>${supplements.map(s=>`<li>${esc(s.name)}</li>`).join('')}</ul></div>`
-      :'';
-    return `<div class="qualification-group"><strong>第4條：符合以下任一資格</strong><ol class="qualification-route-list">${routeList}</ol></div>${supplementHtml}`;
+    const routeChoices=`<fieldset class="qualification-options"><legend>第4條資格路徑（擇一）</legend>${routes.map(r=>`<label class="qualification-choice"><input type="radio" name="detailRoute" value="${esc(r.route.id)}" ${r.route.id===routeId?'checked':''}><span>${esc(r.route.label)}</span></label>`).join('')}</fieldset>`;
+    const supplementChoices=supplements.length?`<fieldset class="qualification-options"><legend>第7條附加資格（擇一）</legend>${supplements.map(r=>`<label class="qualification-choice"><input type="radio" name="detailSupplement" value="${esc(r.supplement.id)}" ${r.supplement.id===supplementId?'checked':''}><span>${esc(r.supplement.name)}</span></label>`).join('')}</fieldset>`:'';
+    const conditions=[...row.route.conditions];
+    if(row.supplement) conditions.push(data.qualifications.article7Note);
+    return routeChoices+supplementChoices+`<div class="qualification-group"><strong>目前選擇的資格條件</strong><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
   }
 
-  const row=routes[0]||group;
   if(row.route.kind==='vocational'){
     const conditions=row.route.conditions.filter(item=>!item.includes('指定科別畢業'));
     return `<div class="qualification-group"><strong>第6條指定高職科別</strong><p class="vocational-major-list">${esc(data.majorPolicy.vocationalMajors.join('、'))}</p><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
@@ -92,20 +97,18 @@ function qualificationConditionsHtml(group,data){
 
   return `<div class="qualification-group"><strong>${esc(row.route.label)}</strong><ul>${row.route.conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
 }
-
 function documentsHtml(docList){
   return docList.map(doc=>{
     const items=(doc.items||[]).length?`<ul>${doc.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:'';
-    const sections=(doc.sections||[]).map(section=>`<div class="document-section"><strong>${esc(section.label)}</strong><ul class="document-alternatives">${section.alternatives.map(alt=>`<li><span class="document-option-label">${esc(alt.label)}</span>${alt.items.length?`<ul>${alt.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ul></div>`).join('');
-    return `<li>${esc(doc.name)}${items}${sections}</li>`;
+    return `<li>${esc(doc.name)}${items}</li>`;
   }).join('');
 }
-
-function showDetail(group,focus=true){
+function showDetail(group,choice={},focus=true){
   state.selected=group.id;
   const data=state.data;
-  const row=group.options[0]||group;
-  const docList=engine.requiredDocumentsForGroup(data,group);
+  const selection=selectedQualification(group,choice);
+  const row=selection.row;
+  const docList=engine.requiredDocuments(data,row);
 
   const primary=row.industry.managerCategory||row.industry.name;
   const specific=row.industry.name!==primary?row.industry.name:'';
@@ -122,7 +125,7 @@ function showDetail(group,focus=true){
     ?`<section><h3>衛生管理人員設置條件</h3><p>${esc(row.industry.managerCondition)}</p></section>`:'';
   const haccpRule=row.query.industry&&row.scenario.haccp
     ?`<section><h3>HACCP 判定條件</h3>${specific?`<p><strong>相關情境：</strong>${esc(specific)}</p>`:''}<p>${esc(row.scenario.condition)}</p></section>`:'';
-  const qualificationHtml=qualificationConditionsHtml(group,data);
+  const qualificationHtml=qualificationControlsHtml(group,selection,data);
   const majorSources=row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[];
 
   $('#hmDetail').className='hygiene-detail';
@@ -134,15 +137,25 @@ function showDetail(group,focus=true){
     `<section><h3>法源依據／官方來源</h3><p>食品製造工廠衛生管理人員設置辦法 ${esc(group.basis)}；第8條。</p>${sourcesHtml([...data.qualifications.sourceIds,...data.industries.sourceIds,...row.industry.sourceIds,...majorSources])}<p class="tool-note">最後確認：${esc(data.qualifications.lastReviewed)}</p></section>`;
 
   renderQualifications();
+  $('#hmDetail').onchange=e=>{
+    const target=e.target;
+    if(!target.matches('[name="detailRoute"],[name="detailSupplement"]')) return;
+    const next={
+      route:$('[name="detailRoute"]:checked')?.value||selection.routeId,
+      supplement:$('[name="detailSupplement"]:checked')?.value
+    };
+    showDetail(group,next,false);
+    const selector=`[name="${target.name}"][value="${target.value}"]`;
+    $(selector)?.focus({preventScroll:true});
+  };
   if(focus){
     $('#hmDetailPanel').focus({preventScroll:true});
     if(window.matchMedia('(max-width:1120px)').matches) $('#hmDetailPanel').scrollIntoView({behavior:'smooth',block:'start'});
   }
 }
-
 function runQualifications(){
   const result=engine.queryQualifications(state.data,qualificationsQuery());
-  state.rows=engine.groupQualifications(state.data,result.rows);state.page=1;clearDetail();renderQualifications();renderActiveConditions();updateAdvancedCount();
+  state.rows=engine.groupQualifications(state.data,result.rows);state.page=1;clearDetail();renderQualifications();renderActiveConditions();
   $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對業別或其他條件。':'已依目前條件列出可能情境；點「應備文件」查看資格細節與文件。');
 }
 
@@ -178,7 +191,7 @@ async function init({manifest,sources,loadJson}){
     $('#hmScope').textContent=data.qualifications.scopeNote;$('#hmReviewed').textContent=config.lastReviewed;
     $('#mcCoverage').textContent=`資料學年：${data.majors.schoolYear}。${data.majors.coverage}`;
     buildIndustryOptions();
-    for(const value of data.qualifications.educationOptions) $('#hmEducation').insertAdjacentHTML('beforeend',`<option value="${esc(value)}">${esc(value)}</option>`);
+    for(const value of data.qualifications.qualificationOptions) $('#hmQualification').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     for(const value of data.qualifications.licenses) $('#hmLicense').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     for(const value of data.qualifications.capitalOptions) $('#hmCapital').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     $('#hmSearch').disabled=false;$('#mcSearch').disabled=false;
@@ -188,10 +201,8 @@ async function init({manifest,sources,loadJson}){
       state.rows=[];state.page=1;clearDetail();renderQualifications();
       $('#hmMessage').textContent='請選擇業別開始查詢。';
       $('#hmActiveConditions').hidden=true;$('#hmActiveConditions').innerHTML='';
-      updateAdvancedCount();
     },0);});
     $('#qualificationForm').addEventListener('input',()=>{
-      updateAdvancedCount();
       if(state.rows.length){state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmActiveConditions').hidden=true;$('#hmMessage').textContent='條件已變更，請重新查詢。';}
     });
 
@@ -199,7 +210,7 @@ async function init({manifest,sources,loadJson}){
       const b=e.target.closest('[data-clear],[data-clear-all]');if(!b)return;
       if(b.hasAttribute('data-clear-all')) $('#qualificationForm').reset();
       else{
-        const map={industry:'#hmIndustry',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
+        const map={industry:'#hmIndustry',qualificationType:'#hmQualification',license:'#hmLicense',capital:'#hmCapital'};
         $(map[b.dataset.clear]).value='';
         if($('#hmIndustry').value) runQualifications(); else $('#qualificationForm').reset();
       }
@@ -209,7 +220,7 @@ async function init({manifest,sources,loadJson}){
     $('#majorForm').addEventListener('reset',()=>{state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='請重新輸入條件查詢。';});
     $('#majorForm').addEventListener('input',()=>{if(state.majors.length){state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='條件已變更，請重新查詢。';}});
 
-    $('#hmRows').addEventListener('click',e=>{const button=e.target.closest('[data-result]');if(button){const row=state.rows.find(r=>r.id===button.dataset.result);if(row)showDetail(row);}});
+    $('#hmRows').addEventListener('click',e=>{const button=e.target.closest('[data-result]');if(button){const row=state.rows.find(r=>r.id===button.dataset.result);if(row)showDetail(row,{},true);}});
     for(const prefix of ['hm','mc']) $('#'+prefix+'Pager').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b||b.disabled)return;state[prefix==='hm'?'page':'majorPage']+=Number(b.dataset.step);(prefix==='hm'?renderQualifications:renderMajors)();});
   }catch(error){
     $('#hmLoadError').hidden=false;$('#hmLoadError').textContent='衛生管理人員資料載入失敗：'+error.message;console.error(error);
