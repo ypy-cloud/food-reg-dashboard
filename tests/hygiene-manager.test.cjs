@@ -77,6 +77,17 @@ test('HACCP never uses article6 and unfiltered capital-neutral rows merge',()=>{
  assert(groups.some(g=>!g.scenario.haccp&&g.type.id==='vocational'&&g.capitalLabel==='未達3,000萬'));
 });
 
+test('professional certificate filter does not rewrite article 4 high-exam proof',()=>{
+ const rows=query({industry:'肉類加工食品業',qualificationType:'article4',license:'animal-husbandry',capital:'atLeast30m'});
+ const group=engine.groupQualifications(data,rows).find(g=>g.scenario.haccp&&g.type.id==='article4');assert(group);
+ const highExam=group.options.find(r=>r.route.id==='a4-high-exam'&&r.supplement?.id==='haccp30');assert(highExam);
+ const proofs=engine.requiredDocuments(data,highExam).find(x=>x.id==='qualifications').items;
+ assert(proofs.includes(data.documents.proofs.highExam));
+ assert(!proofs.some(x=>x.includes('畜牧技師高等考試及格證明')));
+ assert(proofs.some(x=>x.includes('食品技師')&&x.includes('營養師')));
+ assert(proofs.some(x=>x.includes('30小時')));
+});
+
 test('selected article4 and article7 route documents are generated independently',()=>{
  const groups=engine.groupQualifications(data,query({industry:'肉類加工食品業'}));
  const group=groups.find(g=>g.scenario.haccp&&g.type.id==='article4');assert(group);
