@@ -129,10 +129,10 @@ function groupQualifications(data,rows){
 
 function proofItemsForRow(data,row,{includeSupplement=true}={}){
   const ids=[...row.route.documentIds,...(includeSupplement?(row.supplement?.documentIds||[]):[])];
-  const effectiveLicense=row.license||data.qualifications.licenses.find(l=>l.id===row.route.licenseId)||null;
+  const routeLicense=data.qualifications.licenses.find(l=>l.id===row.route.licenseId)||null;
   return [...new Set(ids)].map(id=>{
-    if(id==='highExam'&&effectiveLicense?.examName) return effectiveLicense.examName+'（或'+effectiveLicense.name+'）';
-    return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',effectiveLicense?.name||'');
+    if(id==='highExam') return data.documents.proofs[id];
+    return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',routeLicense?.name||'');
   }).filter(Boolean);
 }
 
