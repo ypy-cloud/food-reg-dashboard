@@ -238,7 +238,7 @@ async function init({manifest,sources,loadJson}){
     const config=manifest.tools.hygieneManager;
     state.data=Object.fromEntries(await Promise.all(Object.entries(config.files).map(async([key,url])=>[key,await loadJson(url)])));
     const data=state.data;
-    $('#hmScope').textContent=data.qualifications.scopeNote;$('#hmReviewed').textContent=config.lastReviewed;
+    $('#hmScope').textContent=data.qualifications.scopeNote.replace(/^以/,'適用前提：').replace(/之食品製造工廠為前提。$/,'');$('#hmReviewed').textContent=config.lastReviewed;
     $('#mcCoverage').textContent=`資料學年：${data.majors.schoolYear}。本頁僅顯示專科以上校系資料；高職科別不納入此查詢。`;
     for(const value of data.majorPolicy.higherEducationLevels||[]) $('#mcLevel').insertAdjacentHTML('beforeend',`<option value="${esc(value)}">${esc(value)}</option>`);
     buildIndustryOptions();
