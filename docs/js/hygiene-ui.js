@@ -159,21 +159,48 @@ function runQualifications(){
   $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對業別或其他條件。':'已依目前條件列出可能情境；點「應備文件」查看資格細節與文件。');
 }
 
+function majorLevelText(levels){
+  return (levels||[]).map(level=>String(level).replace(/^[0-9A-Z]+\s*/,'').trim()).filter(Boolean).join('、');
+}
+function compactMajorSources(){
+  const links=[
+    ['moe-students','教育部校系'],
+    ['moe-bcode','教育部學類'],
+    ['hm-major-guidance','TFDA']
+  ].map(([id,label])=>{
+    const source=state.sources.find(s=>s.id===id);
+    return source?`<a href="${esc(source.url)}" target="_blank" rel="noopener">${label}</a>`:'';
+  }).filter(Boolean);
+  return links.join('｜');
+}
+function tfdaClassHtml(r){
+  if(r.tfdaListed){
+    return `<strong>對應代碼：${esc(r.tfdaCode)}</strong><br><span class="tool-note">${esc(r.className)}${r.tfdaDirect?'':'；請核對實際科系'}</span>`;
+  }
+  return `<span class="status future">未列舉</span><p class="tool-note">${esc(r.reason)}</p>`;
+}
 function renderMajors(){
   $('#mcCount').textContent=`（共 ${state.majors.length} 筆）`;
   $('#mcRows').innerHTML=paginate(state.majors,state.majorPage,'mc').map(r=>'<tr>'+
     cell('學校',esc(r.school))+
-    cell('科系名稱',`<strong>${esc(r.major)}</strong><br><span class="tool-note">${esc(r.education)}／${esc(r.levels.join('、'))}</span>`)+
+    cell('科系名稱',`<strong>${esc(r.major)}</strong><br><span class="tool-note">${esc(majorLevelText(r.levels))}</span>`)+
     cell('學類名稱',esc(r.className)+(r.detailName?'<br><span class="tool-note">'+esc(r.detailName)+'</span>':''))+
     cell('學類代碼',`${esc(r.classCode||'—')}${r.detailCode?'<br>細學類 '+esc(r.detailCode):''}<br><span class="tool-note">科系 ${esc(r.departmentCode||'未收錄代碼')}</span>`)+
-    cell('相關科系判讀',`<span class="status ${r.status==='符合'?'active':'future'}">${esc(r.status)}</span><p class="tool-note">${esc(r.reason)}</p>`)+
-    cell('對應資格條文',esc(r.article))+
-    cell('資料來源',sourcesHtml([...r.sourceIds,r.education==='高職'?'hm-law':'hm-major-guidance']))+
-    cell('最後確認日期',esc(r.lastConfirmed))+'</tr>').join('')||'<tr><td class="empty-cell" colspan="8">需確認：快照中沒有符合條件的紀錄，不代表科系不符合資格。請由官方來源確認畢業年度及相關分類。</td></tr>';
+    cell('TFDA列舉學類',tfdaClassHtml(r))+
+    cell('資料來源',compactMajorSources())+
+    cell('最後確認日期',esc(r.lastConfirmed))+'</tr>').join('')||'<tr><td class="empty-cell" colspan="7">查無已收錄的專科以上校系。請核對學校、科系、學歷或學類條件。</td></tr>';
 }
 function runMajors(){
-  state.majors=engine.searchMajors(state.data,{major:$('#mcMajor').value,school:$('#mcSchool').value,className:$('#mcClass').value,code:$('#mcCode').value});state.majorPage=1;renderMajors();
-  $('#mcMessage').textContent=state.majors.length?'以下為已收錄紀錄。分類碼為判讀依據；「可能符合／需確認」請核對實際學籍與相關細學類。':'查無紀錄時須確認，不能直接認定不符合。';
+  state.majors=engine.searchMajors(state.data,{
+    major:$('#mcMajor').value,
+    school:$('#mcSchool').value,
+    level:$('#mcLevel').value,
+    className:$('#mcClass').value,
+    code:$('#mcCode').value,
+    education:'專科以上'
+  });
+  state.majorPage=1;renderMajors();
+  $('#mcMessage').textContent=state.majors.length?'以下僅顯示專科以上校系；TFDA列舉學類以對應代碼呈現，仍應核對實際科系名稱與學籍資料。':'查無已收錄的專科以上校系；請核對查詢條件。';
 }
 
 async function init({manifest,sources,loadJson}){
@@ -189,7 +216,8 @@ async function init({manifest,sources,loadJson}){
     state.data=Object.fromEntries(await Promise.all(Object.entries(config.files).map(async([key,url])=>[key,await loadJson(url)])));
     const data=state.data;
     $('#hmScope').textContent=data.qualifications.scopeNote;$('#hmReviewed').textContent=config.lastReviewed;
-    $('#mcCoverage').textContent=`資料學年：${data.majors.schoolYear}。${data.majors.coverage}`;
+    $('#mcCoverage').textContent=`資料學年：${data.majors.schoolYear}。本頁僅顯示專科以上校系資料；高職科別不納入此查詢。`;
+    for(const value of data.majorPolicy.higherEducationLevels||[]) $('#mcLevel').insertAdjacentHTML('beforeend',`<option value="${esc(value)}">${esc(value)}</option>`);
     buildIndustryOptions();
     for(const value of data.qualifications.qualificationOptions) $('#hmQualification').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     for(const value of data.qualifications.licenses) $('#hmLicense').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
