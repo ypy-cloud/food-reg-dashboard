@@ -54,7 +54,10 @@ function routeMatchesLicense(route,scenario,licenseId,data){
   const license=data.qualifications.licenses.find(l=>l.id===licenseId);
   if(!license) return false;
   if(licenseId==='chinese-cook-b') return !scenario.haccp&&route.licenseId===licenseId;
-  if(license.article7) return route.id==='a4-high-exam';
+  if(license.article7){
+    const article4=data.qualifications.resultGroups.find(g=>g.id==='article4');
+    return !!article4?.routeIds.includes(route.id);
+  }
   return route.licenseId===licenseId;
 }
 
