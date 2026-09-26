@@ -37,52 +37,51 @@ function industryMatches(industry,query){
 }
 
 function resolveIndustries(data,industryName){
-  if(!industryName) return [data.industries.unspecified];
+  if(!industryName) return [];
   const choice=data.industries.industryChoices?.find(x=>x.value===industryName);
   if(!choice) return [];
   return choice.profileIds.map(id=>data.industries.industries.find(i=>i.id===id)).filter(Boolean);
 }
 
+function routeMatchesLicense(route,scenario,licenseId,data){
+  if(!licenseId) return true;
+  const license=data.qualifications.licenses.find(l=>l.id===licenseId);
+  if(!license) return false;
+  if(licenseId==='chinese-cook-b') return !scenario.haccp&&route.licenseId===licenseId;
+  if(license.article7) return route.id==='a4-high-exam';
+  return route.licenseId===licenseId;
+}
+
 function queryQualifications(data,query={}){
   const q=Object.fromEntries(Object.entries(query).map(([k,v])=>[k,String(v??'').trim()]));
   if(!q.industry) return {error:'請先選擇業別。',rows:[],majors:[]};
-  const majors=[];
-  const knownEducation=new Set();
   const industries=resolveIndustries(data,q.industry);
-  if(q.industry&&!industries.length) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors};
+  if(!industries.length) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors:[]};
   const rows=[];
 
   for(const currentIndustry of industries) for(const scenario of currentIndustry.scenarios) for(const route of data.qualifications.routes){
     if(!route.haccp.includes(scenario.haccp)) continue;
     if(route.industryTag&&!currentIndustry.tags.includes(route.industryTag)) continue;
-    if(route.licenseId&&q.license&&route.licenseId!==q.license) continue;
-
-    let relevant=[];
-    if(route.kind==='degree'||route.kind==='vocational'){
-      const education=route.education[0];
-      relevant=majors.filter(m=>m.education===education&&m.status!=='不符合');
-
-    }
+    if(!routeMatchesLicense(route,scenario,q.license,data)) continue;
 
     for(const education of route.education){
       if(q.education&&q.education!==education) continue;
 
-
       for(const capital of route.capital){
         if(!scenario.capital.includes(capital)||(q.capital&&capital!==q.capital)) continue;
-        const licenses=data.qualifications.licenses;
-        const baseLicense=licenses.find(l=>l.id===(route.licenseId||q.license))||null;
+
+        const selectedLicense=data.qualifications.licenses.find(l=>l.id===q.license)||null;
         const supplements=scenario.haccp
-          ? data.qualifications.supplements.filter(s=>!q.license||!s.licenseIds?.length||s.licenseIds.includes(q.license))
+          ? data.qualifications.supplements.filter(s=>!q.license||(selectedLicense?.article7&&s.licenseIds?.includes(q.license)))
           : [null];
+        if(scenario.haccp&&!supplements.length) continue;
 
         for(const supplement of supplements){
           const basis=[route.article,supplement?.article].filter(Boolean).join('；');
-          const degreePath=route.kind==='degree'||route.kind==='vocational';
-          const majorStatus='';
           rows.push({
-            id:[currentIndustry.id,scenario.id,route.id,education,capital,supplement?.id||'none'].join(':'),
-            industry:currentIndustry,scenario,route,education,capital,license:baseLicense,supplement,basis,majorStatus,majors:relevant,query:{...q},
+            id:[currentIndustry.id,scenario.id,route.id,education,capital,supplement?.id||'none',q.license||'none'].join(':'),
+            industry:currentIndustry,scenario,route,education,capital,
+            license:selectedLicense,supplement,basis,majorStatus:'',majors:[],query:{...q},
             haccpLabel:data.qualifications.haccpLabels[scenario.haccp?'required':'notRequired'],
             capitalLabel:data.qualifications.capitalOptions.find(c=>c.id===capital).name,
             summary:route.summary+(supplement?'；'+supplement.name:''),
@@ -92,14 +91,14 @@ function queryQualifications(data,query={}){
       }
     }
   }
-  return {rows,majors,error:'',unknownIndustry:false};
+  return {rows,majors:[],error:'',unknownIndustry:false};
 }
 
 function groupQualifications(data,rows){
   const groups=new Map();
   for(const row of rows){
     const type=data.qualifications.resultGroups.find(g=>g.routeIds.includes(row.route.id));
-    const mergeCapital=row.route.kind!=='vocational'&&row.scenario.capital.length>1;
+    const mergeCapital=row.route.kind!=='vocational'&&row.scenario.capital.length>1&&!row.query.capital;
     const id=[row.industry.id,row.scenario.id,mergeCapital?'all-capital':row.capital,type.id].join(':');
     if(!groups.has(id)) groups.set(id,{
       ...row,id,type,
@@ -109,7 +108,7 @@ function groupQualifications(data,rows){
     });
     const group=groups.get(id);
     group.capitalValues.add(row.capital);
-    const key=r=>[r.route.id,r.supplement?.id].join(':');
+    const key=r=>[r.route.id,r.supplement?.id,r.license?.id||'none'].join(':');
     if(!group.options.some(r=>key(r)===key(row))) group.options.push(row);
   }
   return [...groups.values()].map(group=>{
@@ -120,16 +119,50 @@ function groupQualifications(data,rows){
   });
 }
 
-function requiredDocuments(data,row){
-  const names=row.majors.filter(m=>m.education==='高職'&&data.majorPolicy.vocationalMajors.includes(m.major)).map(m=>m.major);
-  const majors=[...new Set(names.length?names:data.majorPolicy.vocationalMajors)];
-  const proofIds=[...new Set([...row.route.documentIds,...(row.supplement?.documentIds||[])])];
-  const proofs=proofIds.map(id=>{
+function proofItemsForRow(data,row,{includeSupplement=true}={}){
+  const ids=[...row.route.documentIds,...(includeSupplement?(row.supplement?.documentIds||[]):[]];
+  return [...new Set(ids)].map(id=>{
     if(id==='highExam'&&row.license?.examName) return row.license.examName+'（或'+row.license.name+'）';
-    return data.documents.proofs[id].replace('{majors}',majors.join('、')).replace('{license}',row.license?.name||'');
+    return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',row.license?.name||'');
   });
+}
+
+function requiredDocuments(data,row){
+  const proofs=proofItemsForRow(data,row);
   return data.documents.base.map(doc=>({...doc,items:doc.dynamic?proofs:[]}));
 }
 
-return {normalize,classify,searchMajors,industryMatches,resolveIndustries,queryQualifications,groupQualifications,requiredDocuments};
+function requiredDocumentsForGroup(data,group){
+  if(group.type.id!=='article4') return requiredDocuments(data,group.options[0]||group);
+
+  const routeRows=[...new Map(group.options.map(r=>[r.route.id,r])).values()];
+  const routeAlternatives=routeRows.map(row=>({
+    label:row.route.label,
+    items:proofItemsForRow(data,row,{includeSupplement:false})
+  }));
+  const supplementRows=[...new Map(group.options.filter(r=>r.supplement).map(r=>[r.supplement.id,r])).values()];
+  const supplementAlternatives=supplementRows.map(row=>({
+    label:row.supplement.name,
+    items:[...new Set((row.supplement.documentIds||[]).map(id=>
+      data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',row.license?.name||'')
+    ))]
+  }));
+
+  return data.documents.base.map(doc=>{
+    if(!doc.dynamic) return {...doc,items:[]};
+    return {
+      ...doc,
+      items:[],
+      sections:[
+        {label:'第4條資格證明（擇一）',alternatives:routeAlternatives},
+        ...(supplementAlternatives.length?[{label:'第7條附加資格證明（擇一）',alternatives:supplementAlternatives}]:[])
+      ]
+    };
+  });
+}
+
+return {
+  normalize,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesLicense,
+  queryQualifications,groupQualifications,requiredDocuments,requiredDocumentsForGroup
+};
 });
