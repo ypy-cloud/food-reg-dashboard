@@ -32,6 +32,11 @@ test('industry scenarios remain integrated',()=>{
  assert(canned.some(r=>r.scenario.haccp&&/低酸性|酸化/.test(r.scenario.condition)));
 });
 
+test('article4 degree route uses the explicit degree label',()=>{
+ const route=data.qualifications.routes.find(r=>r.id==='a4-degree');assert(route);
+ assert.equal(route.label,'專科以上相關科系畢業');
+});
+
 test('article4 routes stay grouped into one list row',()=>{
  const groups=engine.groupQualifications(data,query({industry:'肉類加工食品業'}));
  const required=groups.filter(g=>g.scenario.haccp&&g.type.id==='article4');
@@ -50,7 +55,8 @@ test('qualification type, license and capital are strict AND filters',()=>{
 
  const licensed=query({industry:'肉類加工食品業',qualificationType:'article4',license:'food-technologist',capital:'atLeast30m'});
  assert(licensed.length);
- assert(licensed.every(r=>r.route.id==='a4-high-exam'&&r.capital==='atLeast30m'));
+ assert(licensed.every(r=>['a4-degree','a4-high-exam','a4-ordinary-exam'].includes(r.route.id)&&r.capital==='atLeast30m'));
+ assert.deepEqual(new Set(licensed.filter(r=>r.scenario.haccp).map(r=>r.route.id)),new Set(['a4-degree','a4-high-exam','a4-ordinary-exam']));
  assert(licensed.filter(r=>r.scenario.haccp).every(r=>r.supplement?.id==='haccp30'));
 
  assert.equal(query({industry:'肉類加工食品業',qualificationType:'vocational',license:'food-technologist',capital:'under30m'}).length,0);
