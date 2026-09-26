@@ -23,7 +23,8 @@ test('industry selector has 12 choices including central kitchen and meal-box va
  ]);
  assert.equal(data.industries.industryChoices.length,12);
  assert(engine.queryQualifications(data,{industry:'肉類'}).error);
- const majorOnly=query({major:'食品科學系'});assert(majorOnly.length);assert(majorOnly.every(r=>r.industry.id==='unspecified'));
+ assert(engine.queryQualifications(data,{major:'食品科學系'}).error);
+ assert(engine.queryQualifications(data,{}).error);
 });
 
 test('generic instant-meal selection expands ordinary, central-kitchen and meal-box profiles',()=>{
@@ -84,10 +85,9 @@ test('article 7 certificates appear together and files remain explicit',()=>{
 });
 
 test('article 6 vocational path remains available only under 30m and non-HACCP',()=>{
- for(const name of data.majorPolicy.vocationalMajors){
-  const rows=query({major:name,education:'高職',capital:'under30m'});const row=rows.find(r=>r.route.id==='a6-vocational');assert(row,name);
-  const docs=engine.requiredDocuments(data,row);assert(docs[2].items.some(x=>x.includes(name)));assert(docs[2].items.some(x=>x.includes('4年以上')));assert(docs[2].items.some(x=>x.includes('60小時')));
- }
+ const rows=query({industry:'其他食品製造業',education:'高職',capital:'under30m'});
+ const row=rows.find(r=>r.route.id==='a6-vocational');assert(row);
+ const docs=engine.requiredDocuments(data,row);assert(docs[2].items.some(x=>x.includes('高職指定科別畢業證書')));assert(docs[2].items.some(x=>x.includes('4年以上')));assert(docs[2].items.some(x=>x.includes('60小時')));
  assert(!query({industry:'肉類加工食品業',education:'高職',capital:'atLeast30m'}).some(r=>r.route.id==='a6-vocational'));
 });
 
