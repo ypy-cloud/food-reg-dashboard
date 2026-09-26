@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260926-hm-refine">
-<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-refine">
+<link rel="stylesheet" href="css/style.css?v=20260926-hm-integrated">
+<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-integrated">
 </head>
 <body>
 <div class="app-shell">
@@ -52,14 +52,13 @@
           <details class="advanced-search" id="hmAdvanced">
             <summary>更多條件 <span id="hmAdvancedCount"></span></summary>
             <div class="query-grid hygiene-advanced-grid">
-              <label class="field"><span>產品／製程</span><input type="search" id="hmProduct" list="hmProductOptions" autocomplete="off" placeholder="例如：食用油脂、蛋製品、餐盒"><datalist id="hmProductOptions"></datalist></label>
               <label class="field"><span>學校名稱</span><input type="search" id="hmSchool" placeholder="協助辨識系所"></label>
               <label class="field"><span>學歷</span><select id="hmEducation"><option value="">全部</option></select></label>
               <label class="field"><span>證照</span><select id="hmLicense"><option value="">全部</option></select></label>
               <label class="field"><span>資本額</span><select id="hmCapital"><option value="">全部</option></select></label>
             </div>
           </details>
-          <p class="tool-note">業別、科系至少填一項。業別依公告固定選取；產品／製程只用來判斷特定 HACCP 情境。其他條件需要時再展開。</p>
+          <p class="tool-note">業別、科系至少填一項。業別依公告固定選取；選擇即食餐食業或其他食品製造業時，系統會自動展開相關特殊情境。其他條件需要時再展開。</p>
           <div class="query-actions"><button class="btn secondary" type="reset">清除條件</button><button class="btn primary" type="submit" id="hmSearch" disabled>查詢</button></div>
         </form>
         <div class="active-query" id="hmActiveConditions" hidden aria-live="polite"></div>
@@ -238,8 +237,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260926-hm-refine" defer></script>
-<script src="js/hygiene-ui.js?v=20260926-hm-refine" defer></script>
+<script src="js/hygiene-manager.js?v=20260926-hm-integrated" defer></script>
+<script src="js/hygiene-ui.js?v=20260926-hm-integrated" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>
