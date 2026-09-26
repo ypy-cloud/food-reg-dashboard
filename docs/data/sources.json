@@ -22,7 +22,9 @@
   {
     "name": "應置衛生管理人員修正公告",
     "url": "https://www.fda.gov.tw/tc/newsContent.aspx?cid=3&id=25069",
-    "desc": "指定食品製造工廠類別及規模。"
+    "desc": "108年4月9日公告；九個具名業別具工廠登記即納管，其他食品製造業依資本額及食品從業人員門檻。",
+    "id": "hm-industry-scope",
+    "lastReviewed": "2026-09-26"
   },
   {
     "name": "應置專門職業或技術人員 Q&A",
@@ -49,7 +51,7 @@
     "name": "食品製造工廠衛生管理人員設置辦法（現行全文）",
     "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0040005",
     "desc": "108年4月9日修正；核對第4至8條。第5條現行為120小時。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "hm-qa",
@@ -112,49 +114,49 @@
     "name": "肉類加工食品業 HACCP 修正規定（115年3月17日）",
     "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092778321102476",
     "desc": "肉類或雜碎含量50%以上；須工廠登記且食品從業人員5人以上。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-fish",
     "name": "水產加工食品業 HACCP 修正規定（115年3月17日）",
     "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092670910829306",
     "desc": "水產動物含量50%以上；須工廠登記且食品從業人員5人以上。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-dairy",
     "name": "乳品加工食品業 HACCP 現行規定（115年3月17日）",
     "url": "https://consumer.fda.gov.tw/Law/Detail.aspx?lawid=816&nodeID=518",
     "desc": "第三點24種乳品範圍；具工廠登記即達規模，包含調味乳50%、發酵乳飲品40%等產品定義。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-thermal",
     "name": "熱殺菌密閉容器包裝低酸性食品及酸化食品工廠 HACCP 修正規定",
     "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f639092490157845550",
     "desc": "115年3月17日；資本額3,000萬元以上，或未達3,000萬元且食品從業人員5人以上。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-oil",
     "name": "食用油脂工廠 HACCP 規定",
     "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f636935391044833803",
     "desc": "107年5月1日；依第4點分階段已生效規模判讀。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-egg",
     "name": "蛋製品工廠 HACCP 規定",
     "url": "https://consumer.fda.gov.tw/Law/Detail.aspx?lawid=749&nodeID=518",
     "desc": "107年5月1日；液蛋、乾燥蛋粉、醃製蛋品，依第4點分階段已生效規模判讀。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-meal",
     "name": "餐盒食品工廠 HACCP 規定",
     "url": "https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f636695190842357716",
     "desc": "103年8月11日修正；包含盒餐與團膳，工廠規模階段已全部實施。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   },
   {
     "id": "haccp-rail",
@@ -168,6 +170,6 @@
     "name": "TFDA 食品安全管制系統現行法規清單",
     "url": "https://www.fda.gov.tw/TC/law.aspx?cid=62&key=食品安全管制系統",
     "desc": "查核目前公告業別；旅館餐廳等非工廠情境不納入本工廠資格工具。",
-    "lastReviewed": "2026-09-06"
+    "lastReviewed": "2026-09-26"
   }
 ]
