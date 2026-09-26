@@ -69,6 +69,10 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   assert.equal(await page.locator('[name="detailRoute"]').count(),3);
   assert((await page.locator('#hmDetail').innerText()).includes('專科以上相關科系畢業'));
   assert.equal(await page.locator('[name="detailSupplement"]').count(),1);
+  await page.locator('[name="detailRoute"][value="a4-high-exam"]').check();
+  proofs=await page.locator('.document-list').innerText();
+  assert(proofs.includes('第4條第1款相關類科高等考試或相當特種考試及格證明'));
+  assert(!proofs.includes('食品技師高等考試及格證明（或食品技師證書）'));
 
   await page.locator('#qualificationForm button[type="reset"]').click();
   await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});
