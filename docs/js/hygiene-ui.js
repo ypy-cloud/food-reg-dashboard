@@ -3,7 +3,7 @@
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const engine=window.HygieneManager;
-const state={data:null,sources:[],rows:[],majors:[],page:1,majorPage:1,selected:'',size:20};
+const state={data:null,sources:[],rows:[],majors:[],page:1,majorPage:1,selected:'',hmSize:10,mcSize:10};
 
 function sourcesHtml(ids){
   return [...new Set(ids)].map(id=>state.sources.find(s=>s.id===id)).filter(Boolean).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join('<br>');
@@ -23,11 +23,26 @@ function switchTab(major,focus=false){
   }
 }
 function paginate(rows,page,target){
-  const pages=Math.max(1,Math.ceil(rows.length/state.size));
-  const start=(page-1)*state.size;
-  $('#'+target+'PageInfo').textContent=rows.length?`${start+1}–${Math.min(start+state.size,rows.length)} / ${rows.length} 筆`:'0 筆';
-  $('#'+target+'Pager').innerHTML=`<button class="page-btn" type="button" data-step="-1" ${page===1?'disabled':''} aria-label="上一頁">‹</button><span class="tool-note">${page} / ${pages}</span><button class="page-btn" type="button" data-step="1" ${page===pages?'disabled':''} aria-label="下一頁">›</button>`;
-  return rows.slice(start,start+state.size);
+  const size=state[target==='hm'?'hmSize':'mcSize'];
+  const totalPages=Math.max(1,Math.ceil(rows.length/size));
+  const safePage=Math.min(Math.max(1,page),totalPages);
+  const start=(safePage-1)*size;
+  $('#'+target+'PageInfo').textContent=rows.length?`${start+1}–${Math.min(start+size,rows.length)} / ${rows.length} 筆`:'0 筆';
+
+  const visible=[];
+  const add=p=>{if(p>=1&&p<=totalPages&&!visible.includes(p))visible.push(p);};
+  add(1);add(safePage-2);add(safePage-1);add(safePage);add(safePage+1);add(safePage+2);add(totalPages);
+  visible.sort((a,b)=>a-b);
+  let html=`<button class="page-btn" type="button" data-page="${safePage-1}" ${safePage===1?'disabled':''} aria-label="上一頁">‹</button>`;
+  let prev=0;
+  for(const p of visible){
+    if(prev&&p-prev>1) html+='<span class="page-ellipsis">…</span>';
+    html+=`<button class="page-btn ${p===safePage?'on':''}" type="button" data-page="${p}">${p}</button>`;
+    prev=p;
+  }
+  html+=`<button class="page-btn" type="button" data-page="${safePage+1}" ${safePage===totalPages?'disabled':''} aria-label="下一頁">›</button>`;
+  $('#'+target+'Pager').innerHTML=html;
+  return rows.slice(start,start+size);
 }
 function cell(label,html){return `<td data-label="${esc(label)}"><div>${html}</div></td>`;}
 function industryHtml(r){
@@ -257,7 +272,18 @@ async function init({manifest,sources,loadJson}){
     $('#majorForm').addEventListener('input',()=>{if(state.majors.length){state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='條件已變更，請重新查詢。';}});
 
     $('#hmRows').addEventListener('click',e=>{const button=e.target.closest('[data-result]');if(button){const row=state.rows.find(r=>r.id===button.dataset.result);if(row)showDetail(row,{},true);}});
-    for(const prefix of ['hm','mc']) $('#'+prefix+'Pager').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b||b.disabled)return;state[prefix==='hm'?'page':'majorPage']+=Number(b.dataset.step);(prefix==='hm'?renderQualifications:renderMajors)();});
+    for(const prefix of ['hm','mc']){
+      $('#'+prefix+'Pager').addEventListener('click',e=>{
+        const b=e.target.closest('[data-page]');if(!b||b.disabled)return;
+        state[prefix==='hm'?'page':'majorPage']=Number(b.dataset.page)||1;
+        (prefix==='hm'?renderQualifications:renderMajors)();
+      });
+      $('#'+prefix+'PageSize').addEventListener('change',()=>{
+        state[prefix==='hm'?'hmSize':'mcSize']=Number($('#'+prefix+'PageSize').value)||10;
+        state[prefix==='hm'?'page':'majorPage']=1;
+        (prefix==='hm'?renderQualifications:renderMajors)();
+      });
+    }
   }catch(error){
     $('#hmLoadError').hidden=false;$('#hmLoadError').textContent='衛生管理人員資料載入失敗：'+error.message;console.error(error);
   }
