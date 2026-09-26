@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260927-hygiene-pagination">
-<link rel="stylesheet" href="css/mobile.css?v=20260927-hygiene-pagination">
+<link rel="stylesheet" href="css/style.css?v=20260927-hygiene-meta">
+<link rel="stylesheet" href="css/mobile.css?v=20260927-hygiene-meta">
 </head>
 <body>
 <div class="app-shell">
@@ -36,8 +36,7 @@
       <button type="button" class="module-tab on" role="tab" id="qualificationTab" aria-controls="qualificationPanel" aria-selected="true">資格與應備文件查詢</button>
       <button type="button" class="module-tab" role="tab" id="majorTab" aria-controls="majorPanel" aria-selected="false" tabindex="-1">專科以上科系／學類代碼查詢</button>
     </div>
-    <p class="tool-note" id="hmScope"></p>
-    <p class="tool-note">專區最後確認日期：<span id="hmReviewed">載入中</span></p>
+    <p class="tool-note hygiene-meta"><span id="hmScope"></span><span class="hygiene-meta-separator" aria-hidden="true">｜</span><span>最後確認：<span id="hmReviewed">載入中</span></span></p>
   </header>
   <div id="hmLoadError" hidden class="load-error" role="alert"></div>
   <div id="qualificationPanel" role="tabpanel" aria-labelledby="qualificationTab">
@@ -231,8 +230,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260927-hygiene-pagination" defer></script>
-<script src="js/hygiene-ui.js?v=20260927-hygiene-pagination" defer></script>
+<script src="js/hygiene-manager.js?v=20260927-hygiene-meta" defer></script>
+<script src="js/hygiene-ui.js?v=20260927-hygiene-meta" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>
