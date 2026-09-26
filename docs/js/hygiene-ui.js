@@ -50,8 +50,6 @@ function clearDetail(){state.selected='';$('#hmDetail').className='detail-empty'
 function qualificationsQuery(){
   return {
     industry:$('#hmIndustry').value,
-    major:$('#hmMajor').value,
-    school:$('#hmSchool').value,
     education:$('#hmEducation').value,
     license:$('#hmLicense').value,
     capital:$('#hmCapital').value
@@ -59,7 +57,7 @@ function qualificationsQuery(){
 }
 function renderActiveConditions(){
   const q=qualificationsQuery();
-  const labels={industry:'業別',major:'科系',school:'學校',education:'學歷',license:'證照',capital:'資本額'};
+  const labels={industry:'業別',education:'學歷',license:'證照',capital:'資本額'};
   const values={...q};
   if(q.license) values.license=state.data.qualifications.licenses.find(x=>x.id===q.license)?.name||q.license;
   if(q.capital) values.capital=state.data.qualifications.capitalOptions.find(x=>x.id===q.capital)?.name||q.capital;
@@ -69,24 +67,12 @@ function renderActiveConditions(){
   box.innerHTML=entries.length?`<strong>目前查詢條件</strong><div class="active-query-chips">${entries.map(([k,v])=>`<button type="button" class="query-chip" data-clear="${k}" title="移除${esc(labels[k])}條件">${esc(labels[k])}：${esc(v)} ×</button>`).join('')}</div><button type="button" class="text-link clear-all-query" data-clear-all>清除全部</button>`:'';
 }
 function updateAdvancedCount(){
-  const count=[$('#hmSchool').value,$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
+  const count=[$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
   $('#hmAdvancedCount').textContent=count?`（已使用 ${count} 項）`:'';
 }
 function buildIndustryOptions(){
   $('#hmIndustry').insertAdjacentHTML('beforeend',state.data.industries.managerCategories.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(''));
 }
-function buildMajorSuggestions(){
-  const q=$('#hmMajor').value.trim();
-  if(!q){$('#hmMajorOptions').innerHTML='';return;}
-  const seen=new Set(), options=[];
-  for(const r of state.data.majors.records){
-    if(engine.normalize(r.major).includes(engine.normalize(q))&&!seen.has(r.major)){
-      seen.add(r.major);options.push(r.major);if(options.length>=12) break;
-    }
-  }
-  $('#hmMajorOptions').innerHTML=options.map(v=>`<option value="${esc(v)}"></option>`).join('');
-}
-
 function showDetail(group,choice={},focus=true){
   state.selected=group.id;
   const unique=(items,key)=>[...new Map(items.map(item=>[key(item),item])).values()];
@@ -114,9 +100,6 @@ function showDetail(group,choice={},focus=true){
   if(row.supplement){conditions.push(row.supplement.name);conditions.push(data.qualifications.article7Note);}
   if(row.route.kind==='exam'||row.route.kind==='license') conditions.push(data.qualifications.educationNote);
 
-  const majorNote=row.query.major?`<p>輸入科系：${esc(row.query.major)}${row.query.school?'／'+esc(row.query.school):''}。${row.majorStatus?'科系判讀：'+esc(row.majorStatus)+'。':'此為考試／證照路徑，科系輸入不能代替考試或證照證明。'}</p>`:'';
-  const matches=row.majors.slice(0,6).map(m=>`<li>${esc(m.school)}／${esc(m.major)}：${esc(m.classCode||m.departmentCode||'法定科別')} ${esc(m.className)}（${esc(m.status)}）</li>`).join('');
-  const missing=row.query.major&&!row.majors.length&&(row.route.kind==='degree'||row.route.kind==='vocational')?'<p class="tool-caution">未找到可核對的校系紀錄；以下為待確認的資格路徑與文件，不表示輸入科系已符合。</p>':'';
 
   const primary=row.industry.managerCategory||row.industry.name;
   const specific=row.industry.name!==primary?row.industry.name:'';
@@ -132,7 +115,7 @@ function showDetail(group,choice={},focus=true){
   $('#hmDetail').innerHTML=
     `<section><h3>適用情境</h3>${situation}</section>`+
     managerRule+haccpRule+
-    `<section><h3>資格條件</h3>${selectors}${article5}<details class="selected-conditions"><summary>所選路徑的完整資格條件</summary><ul>${conditions.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>${majorNote}${missing}${matches?`<details><summary>符合搜尋條件的科系紀錄（${row.majors.length} 筆）</summary><ul>${matches}</ul>${row.majors.length>6?'<p>完整紀錄可於學類代碼頁籤查詢。</p>':''}</details>`:''}</section>`+
+    `<section><h3>資格條件</h3>${selectors}${article5}<details class="selected-conditions"><summary>所選路徑的完整資格條件</summary><ul>${conditions.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details></section>`+
     `<section><h3>應備文件</h3><ol class="document-list" aria-live="polite">${docList.map(d=>`<li>${esc(d.name)}${d.items.length?`<ul>${d.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ol></section>`+
     `<section><h3>法源依據／官方來源</h3><p>食品製造工廠衛生管理人員設置辦法 ${esc(row.basis)}；第8條。</p>${sourcesHtml([...data.qualifications.sourceIds,...data.industries.sourceIds,...row.industry.sourceIds,...majorSources,...(row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[])])}<p class="tool-note">最後確認：${esc(data.qualifications.lastReviewed)}</p></section>`;
 
@@ -152,7 +135,7 @@ function showDetail(group,choice={},focus=true){
 function runQualifications(){
   const result=engine.queryQualifications(state.data,qualificationsQuery());
   state.rows=engine.groupQualifications(state.data,result.rows);state.page=1;clearDetail();renderQualifications();renderActiveConditions();updateAdvancedCount();
-  $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對業別、科系或更多條件。':'已依目前條件列出可能情境；點「應備文件」查看資格細節與文件。');
+  $('#hmMessage').textContent=result.error||(!result.rows.length?'未找到適用情境。請核對業別或其他條件。':'已依目前條件列出可能情境；點「應備文件」查看資格細節與文件。');
 }
 
 function renderMajors(){
@@ -195,30 +178,28 @@ async function init({manifest,sources,loadJson}){
     $('#qualificationForm').addEventListener('submit',e=>{e.preventDefault();runQualifications();});
     $('#qualificationForm').addEventListener('reset',()=>{setTimeout(()=>{
       state.rows=[];state.page=1;clearDetail();renderQualifications();
-      $('#hmMessage').textContent='請選擇業別或輸入科系開始查詢。';
+      $('#hmMessage').textContent='請選擇業別開始查詢。';
       $('#hmActiveConditions').hidden=true;$('#hmActiveConditions').innerHTML='';
-      $('#hmAdvanced').open=false;updateAdvancedCount();
+      updateAdvancedCount();
     },0);});
     $('#qualificationForm').addEventListener('input',()=>{
       updateAdvancedCount();
       if(state.rows.length){state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmActiveConditions').hidden=true;$('#hmMessage').textContent='條件已變更，請重新查詢。';}
     });
-    $('#hmMajor').addEventListener('input',buildMajorSuggestions);
 
     $('#hmActiveConditions').addEventListener('click',e=>{
       const b=e.target.closest('[data-clear],[data-clear-all]');if(!b)return;
       if(b.hasAttribute('data-clear-all')) $('#qualificationForm').reset();
       else{
-        const map={industry:'#hmIndustry',major:'#hmMajor',school:'#hmSchool',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
+        const map={industry:'#hmIndustry',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
         $(map[b.dataset.clear]).value='';
-        if($('#hmIndustry').value||$('#hmMajor').value) runQualifications(); else $('#qualificationForm').reset();
+        if($('#hmIndustry').value) runQualifications(); else $('#qualificationForm').reset();
       }
     });
 
     $('#majorForm').addEventListener('submit',e=>{e.preventDefault();runMajors();});
     $('#majorForm').addEventListener('reset',()=>{state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='請重新輸入條件查詢。';});
     $('#majorForm').addEventListener('input',()=>{if(state.majors.length){state.majors=[];state.majorPage=1;renderMajors();$('#mcMessage').textContent='條件已變更，請重新查詢。';}});
-    $('#majorShortcut').addEventListener('click',()=>{$('#mcMajor').value=$('#hmMajor').value;$('#mcSchool').value=$('#hmSchool').value;$('#mcClass').value='';$('#mcCode').value='';switchTab(true);runMajors();$('#mcMajor').focus();});
 
     $('#hmRows').addEventListener('click',e=>{const button=e.target.closest('[data-result]');if(button){const row=state.rows.find(r=>r.id===button.dataset.result);if(row)showDetail(row);}});
     for(const prefix of ['hm','mc']) $('#'+prefix+'Pager').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b||b.disabled)return;state[prefix==='hm'?'page':'majorPage']+=Number(b.dataset.step);(prefix==='hm'?renderQualifications:renderMajors)();});
