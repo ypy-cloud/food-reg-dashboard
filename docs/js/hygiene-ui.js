@@ -73,59 +73,67 @@ function updateAdvancedCount(){
 function buildIndustryOptions(){
   $('#hmIndustry').insertAdjacentHTML('beforeend',state.data.industries.managerCategories.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(''));
 }
-function showDetail(group,choice={},focus=true){
+function qualificationConditionsHtml(group,data){
+  const routes=[...new Map(group.options.map(r=>[r.route.id,r])).values()];
+  if(group.type.id==='article4'){
+    const routeList=routes.map(row=>`<li><strong>${esc(row.route.label)}</strong><ul>${row.route.conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></li>`).join('');
+    const supplements=[...new Map(group.options.filter(r=>r.supplement).map(r=>[r.supplement.id,r.supplement])).values()];
+    const supplementHtml=supplements.length
+      ?`<div class="qualification-group"><strong>第7條附加資格：另符合以下任一項</strong><ul>${supplements.map(s=>`<li>${esc(s.name)}</li>`).join('')}</ul></div>`
+      :'';
+    return `<div class="qualification-group"><strong>第4條：符合以下任一資格</strong><ol class="qualification-route-list">${routeList}</ol></div>${supplementHtml}`;
+  }
+
+  const row=routes[0]||group;
+  if(row.route.kind==='vocational'){
+    const conditions=row.route.conditions.filter(item=>!item.includes('指定科別畢業'));
+    return `<div class="qualification-group"><strong>第6條指定高職科別</strong><p class="vocational-major-list">${esc(data.majorPolicy.vocationalMajors.join('、'))}</p><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
+  }
+
+  return `<div class="qualification-group"><strong>${esc(row.route.label)}</strong><ul>${row.route.conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
+}
+
+function documentsHtml(docList){
+  return docList.map(doc=>{
+    const items=(doc.items||[]).length?`<ul>${doc.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:'';
+    const sections=(doc.sections||[]).map(section=>`<div class="document-section"><strong>${esc(section.label)}</strong><ul class="document-alternatives">${section.alternatives.map(alt=>`<li><span class="document-option-label">${esc(alt.label)}</span>${alt.items.length?`<ul>${alt.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ul></div>`).join('');
+    return `<li>${esc(doc.name)}${items}${sections}</li>`;
+  }).join('');
+}
+
+function showDetail(group,focus=true){
   state.selected=group.id;
-  const unique=(items,key)=>[...new Map(items.map(item=>[key(item),item])).values()];
-  const routes=unique(group.options,r=>r.route.id);
-  const routeId=choice.route||routes[0].route.id;
-  const routeOptions=group.options.filter(r=>r.route.id===routeId);
-  const supplements=unique(routeOptions.filter(r=>r.supplement),r=>r.supplement.id);
-  const supplementId=choice.supplement||supplements[0]?.supplement.id;
-  const options=routeOptions.filter(r=>!r.supplement||r.supplement.id===supplementId);
-  const row=options[0]||routeOptions[0];
-
   const data=state.data;
-  const vocationalNames=[...new Set(row.majors.map(m=>m.major).filter(m=>data.majorPolicy.vocationalMajors.includes(m)))];
-  const vocationalOptions=vocationalNames.length?vocationalNames:data.majorPolicy.vocationalMajors;
-  const vocational=choice.vocational||(vocationalNames.length===1?vocationalNames[0]:'');
-  const documentRow=vocational?{...row,majors:[{education:'高職',major:vocational}]}:row;
-  const docList=engine.requiredDocuments(data,documentRow);
-
-  const selectors=`<fieldset class="qualification-options"><legend>可採用的資格路徑</legend>${routes.map(r=>`<label class="qualification-choice"><input type="radio" name="detailRoute" value="${esc(r.route.id)}" ${r.route.id===row.route.id?'checked':''}><span>${r.route.kind==='degree'?esc(r.education)+' ':''}${esc(r.route.label)}</span></label>`).join('')}</fieldset>`+
-    (supplements.length?`<fieldset class="qualification-options"><legend>HACCP 附加資格（擇一）</legend>${supplements.map(r=>`<label class="qualification-choice"><input type="radio" name="detailSupplement" value="${esc(r.supplement.id)}" ${r.supplement.id===row.supplement.id?'checked':''}><span>${esc(r.supplement.name)}</span></label>`).join('')}</fieldset>`:'')+
-    (row.route.kind==='vocational'?`<label class="field detail-select"><span>高職指定科別</span><select id="detailVocational"><option value="">請選擇指定科別</option>${vocationalOptions.map(name=>`<option ${name===vocational?'selected':''}>${esc(name)}</option>`).join('')}</select></label>`:'');
-
-  const majorSources=row.majors.flatMap(m=>m.sourceIds);
-  const conditions=[...row.route.conditions];
-  if(row.supplement){conditions.push(row.supplement.name);conditions.push(data.qualifications.article7Note);}
-  if(row.route.kind==='exam'||row.route.kind==='license') conditions.push(data.qualifications.educationNote);
-
+  const row=group.options[0]||group;
+  const docList=engine.requiredDocumentsForGroup(data,group);
 
   const primary=row.industry.managerCategory||row.industry.name;
   const specific=row.industry.name!==primary?row.industry.name:'';
-  const situation=`<dl class="detail-situation"><div><dt>業別</dt><dd>${esc(primary)}</dd></div><div><dt>學歷／資格</dt><dd>${esc(group.type.name)}</dd></div><div><dt>HACCP</dt><dd>${esc(row.haccpLabel)}</dd></div></dl>`;
+  const industrySituation=specific?`${primary}／${specific}`:primary;
+  const situation=`<dl class="detail-situation">
+    <div><dt>業別／情境</dt><dd>${esc(industrySituation)}</dd></div>
+    <div><dt>學歷／資格</dt><dd>${esc(group.type.name)}</dd></div>
+    <div><dt>資本額條件</dt><dd>${esc(group.capitalLabel)}</dd></div>
+    <div><dt>HACCP 情境</dt><dd>${esc(row.haccpLabel)}</dd></div>
+    <div><dt>法源</dt><dd>${esc(group.basis)}</dd></div>
+  </dl>`;
+
   const managerRule=row.industry.managerCondition&&!/^具工廠登記即屬/.test(row.industry.managerCondition)
     ?`<section><h3>衛生管理人員設置條件</h3><p>${esc(row.industry.managerCondition)}</p></section>`:'';
   const haccpRule=row.query.industry&&row.scenario.haccp
     ?`<section><h3>HACCP 判定條件</h3>${specific?`<p><strong>相關情境：</strong>${esc(specific)}</p>`:''}<p>${esc(row.scenario.condition)}</p></section>`:'';
-  const article5=row.industry.tags.includes('kitchen')
-    ?`<div class="tool-caution"><strong>第5條另有資格：</strong>中央廚房食品工廠或餐盒食品工廠，可由領有中餐烹調乙級技術士證並接受衛生講習120小時以上者擔任。${row.scenario.haccp?' 本情境屬應實施HACCP時，仍須依第7條符合第4條及HACCP附加資格。':''}</div>`:'';
+  const qualificationHtml=qualificationConditionsHtml(group,data);
+  const majorSources=row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[];
 
   $('#hmDetail').className='hygiene-detail';
   $('#hmDetail').innerHTML=
     `<section><h3>適用情境</h3>${situation}</section>`+
     managerRule+haccpRule+
-    `<section><h3>資格條件</h3>${selectors}${article5}<details class="selected-conditions"><summary>所選路徑的完整資格條件</summary><ul>${conditions.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details></section>`+
-    `<section><h3>應備文件</h3><ol class="document-list" aria-live="polite">${docList.map(d=>`<li>${esc(d.name)}${d.items.length?`<ul>${d.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ol></section>`+
-    `<section><h3>法源依據／官方來源</h3><p>食品製造工廠衛生管理人員設置辦法 ${esc(row.basis)}；第8條。</p>${sourcesHtml([...data.qualifications.sourceIds,...data.industries.sourceIds,...row.industry.sourceIds,...majorSources,...(row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[])])}<p class="tool-note">最後確認：${esc(data.qualifications.lastReviewed)}</p></section>`;
+    `<section><h3>資格條件</h3>${qualificationHtml}</section>`+
+    `<section><h3>應備文件</h3><ol class="document-list" aria-live="polite">${documentsHtml(docList)}</ol></section>`+
+    `<section><h3>法源依據／官方來源</h3><p>食品製造工廠衛生管理人員設置辦法 ${esc(group.basis)}；第8條。</p>${sourcesHtml([...data.qualifications.sourceIds,...data.industries.sourceIds,...row.industry.sourceIds,...majorSources])}<p class="tool-note">最後確認：${esc(data.qualifications.lastReviewed)}</p></section>`;
 
   renderQualifications();
-  $('#hmDetail').onchange=e=>{
-    const target=e.target;
-    const next={route:$('[name="detailRoute"]:checked').value,supplement:$('[name="detailSupplement"]:checked')?.value,vocational:$('#detailVocational')?.value};
-    const selector=target.id?'#'+target.id:`[name="${target.name}"][value="${target.value}"]`;
-    showDetail(group,next,false);$(selector)?.focus({preventScroll:true});
-  };
   if(focus){
     $('#hmDetailPanel').focus({preventScroll:true});
     if(window.matchMedia('(max-width:1120px)').matches) $('#hmDetailPanel').scrollIntoView({behavior:'smooth',block:'start'});
