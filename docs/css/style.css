@@ -235,3 +235,9 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 @media(max-width:720px){
   .hygiene-filter-grid,.major-query-grid{grid-template-columns:1fr}
 }
+
+.status.verified{background:#e9f7ee;color:#18753a;border-left-color:#18753a}
+.status.review{background:var(--orange-soft);color:var(--orange-dark);border-left-color:var(--orange-dark)}
+.status.unconfirmed{background:#eef1f4;color:#5f6b77;border-left-color:#788592}
+.tfda-major-name{display:block;margin-top:6px;color:#18753a;font-weight:800}
+.tfda-major-name.review-text{color:var(--orange-dark)}

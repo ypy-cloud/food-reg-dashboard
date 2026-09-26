@@ -6,6 +6,12 @@
 'use strict';
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/臺/g,'台').replace(/\s+/g,'').trim();
 const includes=(value,query)=>normalize(value).includes(normalize(query));
+const normalizeMajorName=value=>normalize(value).replace(/(學位學程|研究所|學系|科系|系|所)$/,'');
+function tfdaMajorMatch(major,policy){
+  const key=normalizeMajorName(major);
+  if(!key) return '';
+  return (policy.tfdaListedMajorNames||[]).find(name=>normalizeMajorName(name)===key)||'';
+}
 
 function classify(record,policy){
   let status,reason,article;
@@ -15,9 +21,10 @@ function classify(record,policy){
   }else{
     const direct=policy.directClassCodes.includes(record.classCode);
     const related=policy.recognizedClassCodes.includes(record.classCode);
+    const tfdaMajorName=tfdaMajorMatch(record.major,policy);
     status=direct?'符合':related?'可能符合':'需確認';
     reason=policy.statusNotes[direct?'direct':related?'related':'unknown'];article='第4條第1款';
-    return {...record,status,reason,article,tfdaListed:direct||related,tfdaDirect:direct,tfdaCode:(direct||related)?record.classCode:''};
+    return {...record,status,reason,article,tfdaListed:direct||related||!!tfdaMajorName,tfdaDirect:direct,tfdaCode:(direct||related)?record.classCode:'',tfdaMajorName,tfdaMajorMatched:!!tfdaMajorName};
   }
   return {...record,status,reason,article,tfdaListed:false,tfdaDirect:false,tfdaCode:''};
 }
@@ -173,7 +180,7 @@ function requiredDocumentsForGroup(data,group){
 }
 
 return {
-  normalize,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesQualification,routeMatchesLicense,
+  normalize,normalizeMajorName,tfdaMajorMatch,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesQualification,routeMatchesLicense,
   queryQualifications,groupQualifications,requiredDocuments,requiredDocumentsForGroup
 };
 });

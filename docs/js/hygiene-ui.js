@@ -174,10 +174,14 @@ function compactMajorSources(){
   return links.join('｜');
 }
 function tfdaClassHtml(r){
-  if(r.tfdaListed){
-    return `<strong>對應代碼：${esc(r.tfdaCode)}</strong><br><span class="tool-note">${esc(r.className)}${r.tfdaDirect?'':'；請核對實際科系'}</span>`;
+  const classLabel=[r.tfdaCode||r.classCode,r.className].filter(Boolean).join(' ');
+  if(r.tfdaMajorMatched){
+    return `<span class="status verified">TFDA資料有列舉</span><strong class="tfda-major-name">${esc(r.tfdaMajorName)}</strong><span class="tool-note">TFDA列舉學類：${esc(classLabel)}</span>`;
   }
-  return `<span class="status future">未列舉</span><p class="tool-note">${esc(r.reason)}</p>`;
+  if(r.tfdaListed){
+    return `<span class="status review">需核對實際科系</span><strong class="tfda-major-name review-text">未找到完全相同科系名稱</strong><span class="tool-note">TFDA列舉學類：${esc(classLabel)}</span>`;
+  }
+  return `<span class="status unconfirmed">請核對實際科系</span><span class="tool-note">${esc(r.reason)}</span>`;
 }
 function renderMajors(){
   $('#mcCount').textContent=`（共 ${state.majors.length} 筆）`;
@@ -200,7 +204,7 @@ function runMajors(){
     education:'專科以上'
   });
   state.majorPage=1;renderMajors();
-  $('#mcMessage').textContent=state.majors.length?'以下僅顯示專科以上校系；TFDA列舉學類以對應代碼呈現，仍應核對實際科系名稱與學籍資料。':'查無已收錄的專科以上校系；請核對查詢條件。';
+  $('#mcMessage').textContent=state.majors.length?'以下僅顯示專科以上校系；TFDA資料有列舉完全對應名稱時以綠色標示，僅學類對應但科系名稱未完全相同時以橘色提示核對。':'查無已收錄的專科以上校系；請核對查詢條件。';
 }
 
 async function init({manifest,sources,loadJson}){
