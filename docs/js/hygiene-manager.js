@@ -36,15 +36,11 @@ function industryMatches(industry,query){
   return values.some(v=>{const nv=normalize(v);return nv.includes(nq)||nq.includes(nv);});
 }
 
-function resolveIndustry(data,industryName,product){
-  if(!industryName) return data.industries.unspecified;
-  if(!data.industries.managerCategories.includes(industryName)) return null;
-  const candidates=data.industries.industries.filter(i=>i.managerCategory===industryName);
-  if(product){
-    const specific=candidates.find(i=>i.name!==industryName&&industryMatches(i,product));
-    if(specific) return specific;
-  }
-  return candidates.find(i=>i.name===industryName)||candidates.find(i=>i.id==='general')||candidates[0]||null;
+function resolveIndustries(data,industryName){
+  if(!industryName) return [data.industries.unspecified];
+  const choice=data.industries.industryChoices?.find(x=>x.value===industryName);
+  if(!choice) return [];
+  return choice.profileIds.map(id=>data.industries.industries.find(i=>i.id===id)).filter(Boolean);
 }
 
 function queryQualifications(data,query={}){
@@ -52,9 +48,8 @@ function queryQualifications(data,query={}){
   if(!q.industry&&!q.major) return {error:'請至少選擇業別或輸入科系其中一項。',rows:[],majors:[]};
   const majors=q.major?searchMajors(data,{major:q.major,school:q.school,education:q.education}):[];
   const knownEducation=new Set(majors.map(m=>m.education));
-  const industry=resolveIndustry(data,q.industry,q.product);
-  if(q.industry&&!industry) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors};
-  const industries=[industry||data.industries.unspecified];
+  const industries=resolveIndustries(data,q.industry);
+  if(q.industry&&!industries.length) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors};
   const rows=[];
 
   for(const currentIndustry of industries) for(const scenario of currentIndustry.scenarios) for(const route of data.qualifications.routes){
@@ -137,5 +132,5 @@ function requiredDocuments(data,row){
   return data.documents.base.map(doc=>({...doc,items:doc.dynamic?proofs:[]}));
 }
 
-return {normalize,classify,searchMajors,industryMatches,resolveIndustry,queryQualifications,groupQualifications,requiredDocuments};
+return {normalize,classify,searchMajors,industryMatches,resolveIndustries,queryQualifications,groupQualifications,requiredDocuments};
 });
