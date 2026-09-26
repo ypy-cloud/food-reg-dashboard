@@ -28,7 +28,7 @@ function searchMajors(data,query={}){
     .map(r=>classify(r,data.majorPolicy));
 }
 function industryMatches(industry,query){
-  const values=[industry.name,industry.managerCategory,...(industry.aliases||[])].filter(Boolean);
+  const values=[industry.name,...(industry.aliases||[])].filter(Boolean);
   const nq=normalize(query);
   return values.some(v=>{const nv=normalize(v);return nv.includes(nq)||nq.includes(nv);});
 }
