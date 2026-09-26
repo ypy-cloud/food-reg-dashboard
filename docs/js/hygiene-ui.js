@@ -87,7 +87,7 @@ function qualificationControlsHtml(group,selection,data){
     const supplementChoices=supplements.length?`<fieldset class="qualification-options"><legend>第7條附加資格（擇一）</legend>${supplements.map(r=>`<label class="qualification-choice"><input type="radio" name="detailSupplement" value="${esc(r.supplement.id)}" ${r.supplement.id===supplementId?'checked':''}><span>${esc(r.supplement.name)}</span></label>`).join('')}</fieldset>`:'';
     const conditions=[...row.route.conditions];
     if(row.supplement) conditions.push(data.qualifications.article7Note);
-    return routeChoices+supplementChoices+`<div class="qualification-group"><strong>目前選擇的資格條件</strong><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
+    return routeChoices+supplementChoices+`<details class="selected-conditions"><summary>目前選擇的資格條件</summary><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></details>`;
   }
 
   if(row.route.kind==='vocational'){
