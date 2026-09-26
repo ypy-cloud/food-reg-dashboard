@@ -94,7 +94,7 @@ function qualificationControlsHtml(group,selection,data){
     const conditions=row.route.conditions.filter(item=>!item.includes('指定科別畢業'));
     const interpretations=data.majorPolicy.vocationalInterpretations||[];
     const interpretationHtml=interpretations.length
-      ?`<div class="qualification-group"><strong>函釋認定科別</strong>${interpretations.map(item=>`<p class="vocational-major-list"><span class="status active">函釋認定</span> <strong>${esc(item.major)}</strong><br><span class="tool-note">${esc(item.basis)}；${esc(item.note)}</span></p>`).join('')}</div>`
+      ?`<div class="qualification-group vocational-interpretations">${interpretations.map(item=>`<div class="vocational-interpretation-line"><span class="status active">函釋認定</span><strong>${esc(item.major)}</strong></div><div class="tool-note vocational-interpretation-basis">${esc(item.basis)}</div>`).join('')}</div>`
       :'';
     return `<div class="qualification-group"><strong>第6條原列舉高職科別（15科）</strong><p class="vocational-major-list">${esc(data.majorPolicy.vocationalMajors.join('、'))}</p></div>${interpretationHtml}<div class="qualification-group"><strong>其他資格條件</strong><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
   }

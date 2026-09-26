@@ -241,3 +241,8 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 .status.unconfirmed{background:#eef1f4;color:#5f6b77;border-left-color:#788592}
 .tfda-major-name{display:block;margin-top:6px;color:#18753a;font-weight:800}
 .tfda-major-name.review-text{color:var(--orange-dark)}
+
+.vocational-interpretations{padding-top:8px;padding-bottom:8px}
+.vocational-interpretation-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vocational-interpretation-line .status{flex:none}
+.vocational-interpretation-basis{margin-top:4px}
