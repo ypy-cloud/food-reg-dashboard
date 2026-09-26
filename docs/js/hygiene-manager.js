@@ -6,11 +6,60 @@
 'use strict';
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/臺/g,'台').replace(/\s+/g,'').trim();
 const includes=(value,query)=>normalize(value).includes(normalize(query));
-const normalizeMajorName=value=>normalize(value).replace(/(學位學程|研究所)$/,'').replace(/系$/,'');
+const MAJOR_PROGRAM_SUFFIXES=[
+  '二年制在職學位學程','國際研究生博士學位學程','國際研究生碩士學位學程',
+  '博士在職學位學程','碩士在職學位學程','學士在職學位學程',
+  '產業博士學位學程','產業碩士學位學程','產業學士學位學程',
+  '國際博士學位學程','國際碩士學位學程','國際學士學位學程','進修學士學位學程',
+  '博士學位學程','碩士學位學程','學士學位學程',
+  '博士在職專班','碩士在職專班','博士在職班','碩士在職班',
+  '博士專班','碩士專班','博士班','碩士班','學士班',
+  '在職學位學程','在職專班','在職班','學位學程','研究所',
+  '七年制','六年制','五年制','四年制','二年制'
+].map(normalize).sort((a,b)=>b.length-a.length);
+
+function stripMajorProgramSuffix(value){
+  let text=normalize(value).replace(/[（(][^（）()]*[）)]$/,'');
+  let changed=true;
+  while(changed){
+    changed=false;
+    for(const suffix of MAJOR_PROGRAM_SUFFIXES){
+      if(text.endsWith(suffix)){
+        text=text.slice(0,-suffix.length);
+        changed=true;
+        break;
+      }
+    }
+  }
+  return text;
+}
+
+function majorNameCandidates(value){
+  const normalized=normalize(value);
+  const roots=[normalized];
+  if(normalized.includes('_')) roots.push(normalized.split('_')[0]);
+  const candidates=[];
+  for(const root of roots){
+    const base=stripMajorProgramSuffix(root);
+    const variants=[
+      base,
+      base.endsWith('系')?base.slice(0,-1):'',
+      base.endsWith('科')?base.slice(0,-1):'',
+      base.endsWith('學系')?base.slice(0,-2):'',
+      base.endsWith('科系')?base.slice(0,-2):''
+    ];
+    for(const item of variants) if(item&&!candidates.includes(item)) candidates.push(item);
+  }
+  return candidates;
+}
+
 function tfdaMajorMatch(major,policy){
-  const key=normalizeMajorName(major);
-  if(!key) return '';
-  return (policy.tfdaListedMajorNames||[]).find(name=>normalizeMajorName(name)===key)||'';
+  const tfdaNames=(policy.tfdaListedMajorNames||[]).map(name=>({name,key:normalize(name)}));
+  for(const candidate of majorNameCandidates(major)){
+    const hit=tfdaNames.find(item=>item.key===candidate);
+    if(hit) return hit.name;
+  }
+  return '';
 }
 
 function classify(record,policy){
@@ -180,7 +229,7 @@ function requiredDocumentsForGroup(data,group){
 }
 
 return {
-  normalize,normalizeMajorName,tfdaMajorMatch,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesQualification,routeMatchesLicense,
+  normalize,stripMajorProgramSuffix,majorNameCandidates,tfdaMajorMatch,classify,searchMajors,industryMatches,resolveIndustries,routeMatchesQualification,routeMatchesLicense,
   queryQualifications,groupQualifications,requiredDocuments,requiredDocumentsForGroup
 };
 });
