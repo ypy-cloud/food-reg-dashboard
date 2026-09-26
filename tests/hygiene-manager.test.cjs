@@ -6,7 +6,7 @@ const engine=require('../docs/js/hygiene-manager.js');const query=q=>engine.quer
 test('all JSON, manifest module names, IDs, current and future separation',()=>{
  for(const file of fs.readdirSync(path.join(root,'data')).filter(f=>f.endsWith('.json'))) json('data/'+file);
  const ids=new Set();
- for(const m of manifest.modules){const d=json(m.file);assert.equal(d.name,m.name);for(const r of d.rules){assert(!ids.has(r.id),`${m.id} duplicate ${r.id}`);ids.add(r.id);assert(Array.isArray(r.areas));}for(const r of (d.current||d.rules.filter(r=>r.status!=='未來實施'))){assert.notEqual(r.status,'未來實施');if(/^\d{4}-/.test(r.start))assert(r.start<='2026-09-06');}}
+ for(const m of manifest.modules){const d=json(m.file);assert.equal(d.name,m.name);for(const r of d.rules){assert(!ids.has(r.id),`${m.id} duplicate ${r.id}`);ids.add(r.id);assert(Array.isArray(r.areas));}for(const r of (d.current||d.rules.filter(r=>r.status!=='未來實施'))){assert.notEqual(r.status,'未來實施');if(/^\d{4}-/.test(r.start))assert(r.start<='2026-09-26');}}
  const sourceIds=new Set(json(manifest.sources).map(s=>s.id).filter(Boolean));
  for(const d of Object.values(data))for(const id of d.sourceIds||[])assert(sourceIds.has(id),id);
  for(const i of data.industries.industries)for(const id of i.sourceIds)assert(sourceIds.has(id));
@@ -16,6 +16,25 @@ test('all JSON, manifest module names, IDs, current and future separation',()=>{
 test('industry OR major required; school and dropdowns alone do not bypass',()=>{
  for(const q of [{},{school:'海洋'},{education:'高職',capital:'under30m'}])assert(engine.queryQualifications(data,q).error);
 });
+
+test('manager industries use nine named categories plus other food manufacturing',()=>{
+ const named=['乳品製造業','罐頭食品製造業','冷凍食品製造業','即食餐食業','特殊營養食品製造業','食品添加物製造業','水產食品業','肉類加工食品業','健康食品製造業'];
+ for(const name of named){const rows=query({industry:name});assert(rows.length,name);assert(rows.every(r=>r.industry.managerCategory===name),name);}
+ const oil=query({industry:'食用油脂'});assert(oil.length);assert(oil.every(r=>r.industry.managerCategory==='其他食品製造業'));
+ const other=query({industry:'其他食品製造業'});assert(other.length);assert(other.every(r=>r.industry.id==='general'));
+});
+
+test('major-only search does not fan out across every industry or invent HACCP',()=>{
+ const rows=query({major:'食品科學系'});assert(rows.length);assert(rows.every(r=>r.industry.id==='unspecified'));assert(rows.every(r=>!r.scenario.haccp));
+});
+
+test('article 4 is not presented as general qualification and HACCP only appears on specific industry matches',()=>{
+ const groups=engine.groupQualifications(data,query({industry:'肉類'}));assert(groups.some(g=>g.type.name==='相關科系／考試資格'));assert(!groups.some(g=>g.type.name==='一般資格'));
+ assert(query({industry:'冷凍食品'}).every(r=>!r.scenario.haccp));
+ assert(query({industry:'特殊營養食品'}).every(r=>!r.scenario.haccp));
+ assert(query({industry:'肉類'}).some(r=>r.scenario.haccp));
+});
+
 test('meat enumerates all capital and HACCP cases; never independent article7 or invalid vocational HACCP',()=>{
  const rows=query({industry:'肉類'});assert(rows.length>10);assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
  assert.deepEqual(new Set(rows.map(r=>r.capital)),new Set(['under30m','atLeast30m']));
