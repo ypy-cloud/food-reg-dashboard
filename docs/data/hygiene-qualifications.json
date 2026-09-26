@@ -273,5 +273,15 @@
         "haccp60"
       ]
     }
+  ],
+  "qualificationOptions": [
+    {
+      "id": "article4",
+      "name": "專科以上／考試資格"
+    },
+    {
+      "id": "vocational",
+      "name": "高職"
+    }
   ]
 }
