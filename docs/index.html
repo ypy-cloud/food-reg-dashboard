@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260927-vocational-compact">
-<link rel="stylesheet" href="css/mobile.css?v=20260927-vocational-compact">
+<link rel="stylesheet" href="css/style.css?v=20260927-hygiene-pagination">
+<link rel="stylesheet" href="css/mobile.css?v=20260927-hygiene-pagination">
 </head>
 <body>
 <div class="app-shell">
@@ -59,7 +59,7 @@
           <div class="results-head"><h2>適用情境 <span class="result-count" id="hmCount"></span></h2></div>
           <p class="tool-note result-note" id="hmMessage" role="status" aria-live="polite">請選擇業別開始查詢。</p>
           <div class="tablewrap"><table class="tool-table qualification-table"><thead><tr><th>業別</th><th>學歷／資格</th><th>資本額條件</th><th>HACCP 情境</th><th>法源</th><th>操作</th></tr></thead><tbody id="hmRows"></tbody></table></div>
-          <div class="pagination-bar"><span class="page-info" id="hmPageInfo"></span><div class="pager" id="hmPager" aria-label="資格查詢分頁"></div></div>
+          <div class="pagination-bar"><label class="page-size">每頁顯示 <select id="hmPageSize"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select> 筆</label><span class="page-info" id="hmPageInfo"></span><div class="pager" id="hmPager" aria-label="資格查詢分頁"></div></div>
         </div>
       </div>
       <aside class="panel detail-panel" id="hmDetailPanel" tabindex="-1" aria-labelledby="hmDetailTitle"><h2 class="panel-title" id="hmDetailTitle">詳細內容</h2><div id="hmDetail" class="detail-empty">請點選任一結果的「應備文件」。</div></aside>
@@ -83,7 +83,7 @@
       <div class="results-head"><h2>專科以上科系查詢結果 <span class="result-count" id="mcCount"></span></h2></div>
       <p class="tool-note result-note" id="mcMessage" role="status" aria-live="polite">可依任一欄位查詢，或直接查詢全部已收錄的專科以上校系。</p>
       <div class="tablewrap"><table class="tool-table major-table"><thead><tr><th>學校</th><th>科系名稱</th><th>學類名稱</th><th>學類代碼</th><th>TFDA列舉科系／學類</th><th>資料來源</th><th>最後確認日期</th></tr></thead><tbody id="mcRows"></tbody></table></div>
-      <div class="pagination-bar"><span class="page-info" id="mcPageInfo"></span><div class="pager" id="mcPager" aria-label="科系查詢分頁"></div></div>
+      <div class="pagination-bar"><label class="page-size">每頁顯示 <select id="mcPageSize"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select> 筆</label><span class="page-info" id="mcPageInfo"></span><div class="pager" id="mcPager" aria-label="科系查詢分頁"></div></div>
     </div>
   </div>
 </section>
@@ -231,8 +231,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260927-vocational-compact" defer></script>
-<script src="js/hygiene-ui.js?v=20260927-vocational-compact" defer></script>
+<script src="js/hygiene-manager.js?v=20260927-hygiene-pagination" defer></script>
+<script src="js/hygiene-ui.js?v=20260927-hygiene-pagination" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>
