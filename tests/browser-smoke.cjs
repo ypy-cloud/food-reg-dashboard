@@ -18,9 +18,14 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   const downloadPromise=page.waitForEvent('download');await page.locator('#csvBtn').click();const download=await downloadPromise;assert(download.suggestedFilename().endsWith('.csv'));
 
   await page.locator('#hygieneNav').click();
-  await page.locator('#hmSearch').click();assert((await page.locator('#hmMessage').innerText()).includes('至少'));
+  await page.locator('#hmSearch').click();assert((await page.locator('#hmMessage').innerText()).includes('選擇業別'));
   assert.equal(await page.locator('#hmIndustry option').count(),13);
-  assert.equal(await page.locator('#hmProduct').count(),0);
+  assert.equal(await page.locator('#hmMajor').count(),0);
+  assert.equal(await page.locator('#hmSchool').count(),0);
+  assert.equal(await page.locator('#hmAdvanced summary').count(),0);
+  assert(await page.locator('#hmEducation').isVisible());
+  assert(await page.locator('#hmLicense').isVisible());
+  assert(await page.locator('#hmCapital').isVisible());
 
   await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});await page.locator('#hmSearch').click();
   const meatText=await page.locator('#hmRows').innerText();
@@ -65,9 +70,9 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   const cannedHaccp=page.locator('#hmRows tr').filter({hasText:'應實施 HACCP'}).first();await cannedHaccp.getByRole('button',{name:'應備文件',exact:true}).click();
   detail=await page.locator('#hmDetail').innerText();assert(/低酸性|酸化/.test(detail));
 
-  await page.locator('#qualificationForm button[type="reset"]').click();await page.locator('#hmMajor').fill('食品科學系');await page.locator('#hmSearch').click();
-  assert((await page.locator('#hmRows').innerText()).includes('專科以上／考試資格'));
-  await page.locator('#majorShortcut').click();assert.equal(await page.locator('#mcMajor').inputValue(),'食品科學系');assert(await page.locator('#majorPanel').isVisible());
+  await page.locator('#majorTab').click();assert(await page.locator('#majorPanel').isVisible());
+  await page.locator('#mcMajor').fill('食品科學系');await page.locator('#mcSearch').click();
+  assert((await page.locator('#mcRows').innerText()).includes('食品科學系'));
 
   const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:1});mobile.on('pageerror',e=>errors.push(e.message));
   await mobile.goto(base);await mobile.locator('#hmSearch:not([disabled])').waitFor({state:'attached'});await mobile.locator('#hygieneNav').click();
