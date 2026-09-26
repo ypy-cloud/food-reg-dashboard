@@ -50,7 +50,6 @@ function clearDetail(){state.selected='';$('#hmDetail').className='detail-empty'
 function qualificationsQuery(){
   return {
     industry:$('#hmIndustry').value,
-    product:$('#hmProduct').value,
     major:$('#hmMajor').value,
     school:$('#hmSchool').value,
     education:$('#hmEducation').value,
@@ -60,7 +59,7 @@ function qualificationsQuery(){
 }
 function renderActiveConditions(){
   const q=qualificationsQuery();
-  const labels={industry:'業別',product:'產品／製程',major:'科系',school:'學校',education:'學歷',license:'證照',capital:'資本額'};
+  const labels={industry:'業別',major:'科系',school:'學校',education:'學歷',license:'證照',capital:'資本額'};
   const values={...q};
   if(q.license) values.license=state.data.qualifications.licenses.find(x=>x.id===q.license)?.name||q.license;
   if(q.capital) values.capital=state.data.qualifications.capitalOptions.find(x=>x.id===q.capital)?.name||q.capital;
@@ -70,16 +69,11 @@ function renderActiveConditions(){
   box.innerHTML=entries.length?`<strong>目前查詢條件</strong><div class="active-query-chips">${entries.map(([k,v])=>`<button type="button" class="query-chip" data-clear="${k}" title="移除${esc(labels[k])}條件">${esc(labels[k])}：${esc(v)} ×</button>`).join('')}</div><button type="button" class="text-link clear-all-query" data-clear-all>清除全部</button>`:'';
 }
 function updateAdvancedCount(){
-  const count=[$('#hmProduct').value,$('#hmSchool').value,$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
+  const count=[$('#hmSchool').value,$('#hmEducation').value,$('#hmLicense').value,$('#hmCapital').value].filter(Boolean).length;
   $('#hmAdvancedCount').textContent=count?`（已使用 ${count} 項）`:'';
 }
 function buildIndustryOptions(){
   $('#hmIndustry').insertAdjacentHTML('beforeend',state.data.industries.managerCategories.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(''));
-}
-function buildProductSuggestions(){
-  const industry=$('#hmIndustry').value;
-  const values=state.data.industries.productSuggestions?.[industry]||[];
-  $('#hmProductOptions').innerHTML=values.map(v=>`<option value="${esc(v)}"></option>`).join('');
 }
 function buildMajorSuggestions(){
   const q=$('#hmMajor').value.trim();
@@ -193,7 +187,6 @@ async function init({manifest,sources,loadJson}){
     $('#hmScope').textContent=data.qualifications.scopeNote;$('#hmReviewed').textContent=config.lastReviewed;
     $('#mcCoverage').textContent=`資料學年：${data.majors.schoolYear}。${data.majors.coverage}`;
     buildIndustryOptions();
-    buildProductSuggestions();
     for(const value of data.qualifications.educationOptions) $('#hmEducation').insertAdjacentHTML('beforeend',`<option value="${esc(value)}">${esc(value)}</option>`);
     for(const value of data.qualifications.licenses) $('#hmLicense').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
     for(const value of data.qualifications.capitalOptions) $('#hmCapital').insertAdjacentHTML('beforeend',`<option value="${esc(value.id)}">${esc(value.name)}</option>`);
@@ -204,22 +197,20 @@ async function init({manifest,sources,loadJson}){
       state.rows=[];state.page=1;clearDetail();renderQualifications();
       $('#hmMessage').textContent='請選擇業別或輸入科系開始查詢。';
       $('#hmActiveConditions').hidden=true;$('#hmActiveConditions').innerHTML='';
-      $('#hmAdvanced').open=false;buildProductSuggestions();updateAdvancedCount();
+      $('#hmAdvanced').open=false;updateAdvancedCount();
     },0);});
     $('#qualificationForm').addEventListener('input',()=>{
       updateAdvancedCount();
       if(state.rows.length){state.rows=[];state.page=1;clearDetail();renderQualifications();$('#hmActiveConditions').hidden=true;$('#hmMessage').textContent='條件已變更，請重新查詢。';}
     });
-    $('#hmIndustry').addEventListener('change',()=>{buildProductSuggestions();});
     $('#hmMajor').addEventListener('input',buildMajorSuggestions);
 
     $('#hmActiveConditions').addEventListener('click',e=>{
       const b=e.target.closest('[data-clear],[data-clear-all]');if(!b)return;
       if(b.hasAttribute('data-clear-all')) $('#qualificationForm').reset();
       else{
-        const map={industry:'#hmIndustry',product:'#hmProduct',major:'#hmMajor',school:'#hmSchool',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
+        const map={industry:'#hmIndustry',major:'#hmMajor',school:'#hmSchool',education:'#hmEducation',license:'#hmLicense',capital:'#hmCapital'};
         $(map[b.dataset.clear]).value='';
-        if(b.dataset.clear==='industry') buildProductSuggestions();
         if($('#hmIndustry').value||$('#hmMajor').value) runQualifications(); else $('#qualificationForm').reset();
       }
     });
