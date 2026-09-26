@@ -154,11 +154,38 @@ test('TFDA listed major name matching distinguishes exact-name evidence from cla
 });
 
 
-test('major-name normalization keeps 學 in 食品科學系',()=>{
- assert.equal(engine.normalizeMajorName('食品科學系'),'食品科學');
- assert.equal(engine.normalizeMajorName('食品科技系'),'食品科技');
- assert.equal(engine.normalizeMajorName('食品科學研究所'),'食品科學');
- const matched=engine.classify({education:'專科以上',major:'食品科學系',classCode:'0721',className:'食品科學學類'},data.majorPolicy);
- assert.equal(matched.tfdaMajorMatched,true);
- assert.equal(matched.tfdaMajorName,'食品科學');
+test('TFDA major candidates handle department and program suffixes safely',()=>{
+ const cases=[
+  ['食品科學系','食品科學'],
+  ['食品科技科','食品科技'],
+  ['食品暨應用生物科技學系','食品暨應用生物科技'],
+  ['食品安全管理碩士在職學位學程','食品安全管理'],
+  ['食品營養博士學位學程','食品營養'],
+  ['食品科學系碩士在職專班','食品科學'],
+  ['食品生技碩士學位學程在職專班','食品生技'],
+  ['水產食品科學系碩士在職班','水產食品科學'],
+  ['食品科學系_食品產業技優專班','食品科學'],
+  ['生物與食品科技系_國際專修部','生物與食品科技'],
+  ['營養學系','營養'],
+  ['保健營養學系','保健營養']
+ ];
+ for(const [major,name] of cases){
+  assert.equal(engine.tfdaMajorMatch(major,data.majorPolicy),name,major);
+ }
+});
+
+test('TFDA candidate matching does not use loose substring matching',()=>{
+ assert.equal(engine.tfdaMajorMatch('生物科技與食品營養學士學位學程',data.majorPolicy),'');
+ assert.equal(engine.tfdaMajorMatch('食品創新管理學系',data.majorPolicy),'');
+});
+
+
+test('all current higher-education TFDA names are checked through the candidate matcher',()=>{
+ const rows=engine.searchMajors(data,{education:'專科以上'});
+ const matched=rows.filter(r=>r.tfdaMajorMatched);
+ assert(matched.length>1000);
+ assert(matched.some(r=>r.major==='食品暨應用生物科技學系'&&r.tfdaMajorName==='食品暨應用生物科技'));
+ assert(matched.some(r=>r.major==='食品安全管理碩士在職學位學程'&&r.tfdaMajorName==='食品安全管理'));
+ assert(matched.some(r=>r.major==='食品科技科'&&r.tfdaMajorName==='食品科技'));
+ assert(matched.some(r=>r.major==='食品營養博士學位學程'&&r.tfdaMajorName==='食品營養'));
 });
