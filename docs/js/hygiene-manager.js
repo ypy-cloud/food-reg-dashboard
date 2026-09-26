@@ -17,8 +17,9 @@ function classify(record,policy){
     const related=policy.recognizedClassCodes.includes(record.classCode);
     status=direct?'符合':related?'可能符合':'需確認';
     reason=policy.statusNotes[direct?'direct':related?'related':'unknown'];article='第4條第1款';
+    return {...record,status,reason,article,tfdaListed:direct||related,tfdaDirect:direct,tfdaCode:(direct||related)?record.classCode:''};
   }
-  return {...record,status,reason,article};
+  return {...record,status,reason,article,tfdaListed:false,tfdaDirect:false,tfdaCode:''};
 }
 
 function searchMajors(data,query={}){
@@ -26,7 +27,8 @@ function searchMajors(data,query={}){
     (!query.school||(!r.statutory&&includes(r.school,query.school)))&&
     (!query.className||includes([r.className,r.detailName].join(' '),query.className))&&
     (!query.code||includes([r.classCode,r.detailCode,r.departmentCode].join(' '),query.code))&&
-    (!query.education||r.education===query.education))
+    (!query.education||r.education===query.education)&&
+    (!query.level||(r.levels||[]).some(level=>includes(level,query.level))))
     .map(r=>classify(r,data.majorPolicy));
 }
 
