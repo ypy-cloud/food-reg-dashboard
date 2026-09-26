@@ -6,6 +6,7 @@
 'use strict';
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/臺/g,'台').replace(/\s+/g,'').trim();
 const includes=(value,query)=>normalize(value).includes(normalize(query));
+
 function classify(record,policy){
   let status,reason,article;
   if(record.education==='高職'){
@@ -19,6 +20,7 @@ function classify(record,policy){
   }
   return {...record,status,reason,article};
 }
+
 function searchMajors(data,query={}){
   return data.majors.records.filter(r=>(!query.major||includes(r.major,query.major))&&
     (!query.school||(!r.statutory&&includes(r.school,query.school)))&&
@@ -27,26 +29,39 @@ function searchMajors(data,query={}){
     (!query.education||r.education===query.education))
     .map(r=>classify(r,data.majorPolicy));
 }
+
 function industryMatches(industry,query){
   const values=[industry.name,...(industry.aliases||[])].filter(Boolean);
   const nq=normalize(query);
   return values.some(v=>{const nv=normalize(v);return nv.includes(nq)||nq.includes(nv);});
 }
+
+function resolveIndustry(data,industryName,product){
+  if(!industryName) return data.industries.unspecified;
+  if(!data.industries.managerCategories.includes(industryName)) return null;
+  const candidates=data.industries.industries.filter(i=>i.managerCategory===industryName);
+  if(product){
+    const specific=candidates.find(i=>i.name!==industryName&&industryMatches(i,product));
+    if(specific) return specific;
+  }
+  return candidates.find(i=>i.name===industryName)||candidates.find(i=>i.id==='general')||candidates[0]||null;
+}
+
 function queryQualifications(data,query={}){
   const q=Object.fromEntries(Object.entries(query).map(([k,v])=>[k,String(v??'').trim()]));
-  if(!q.industry&&!q.major) return {error:'請至少輸入業別或科系其中一項。',rows:[],majors:[]};
+  if(!q.industry&&!q.major) return {error:'請至少選擇業別或輸入科系其中一項。',rows:[],majors:[]};
   const majors=q.major?searchMajors(data,{major:q.major,school:q.school,education:q.education}):[];
   const knownEducation=new Set(majors.map(m=>m.education));
-  let industries;
-  if(q.industry){
-    industries=data.industries.industries.filter(i=>industryMatches(i,q.industry));
-    if(!industries.length) industries=[{...data.industries.unknown,name:q.industry+'（待確認）'}];
-  }else industries=[data.industries.unspecified];
+  const industry=resolveIndustry(data,q.industry,q.product);
+  if(q.industry&&!industry) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors};
+  const industries=[industry||data.industries.unspecified];
   const rows=[];
-  for(const industry of industries) for(const scenario of industry.scenarios) for(const route of data.qualifications.routes){
+
+  for(const currentIndustry of industries) for(const scenario of currentIndustry.scenarios) for(const route of data.qualifications.routes){
     if(!route.haccp.includes(scenario.haccp)) continue;
-    if(route.industryTag&&!industry.tags.includes(route.industryTag)) continue;
+    if(route.industryTag&&!currentIndustry.tags.includes(route.industryTag)) continue;
     if(route.licenseId&&q.license&&route.licenseId!==q.license) continue;
+
     let relevant=[];
     if(route.kind==='degree'||route.kind==='vocational'){
       const education=route.education[0];
@@ -54,43 +69,63 @@ function queryQualifications(data,query={}){
       if(q.major&&majors.length&&!relevant.length) continue;
       if(q.major&&knownEducation.size&&!knownEducation.has(education)) continue;
     }
+
     for(const education of route.education){
       if(q.education&&q.education!==education) continue;
       if(q.major&&!q.education&&knownEducation.size&&!knownEducation.has(education)) continue;
+
       for(const capital of route.capital){
         if(!scenario.capital.includes(capital)||(q.capital&&capital!==q.capital)) continue;
         const licenses=data.qualifications.licenses;
-        const baseLicense=licenses.find(l=>l.id===(route.licenseId||q.license));
-        const options=scenario.haccp?data.qualifications.supplements.flatMap(s=>s.licenseRequired?
-          licenses.filter(l=>l.article7&&(!q.license||q.license===l.id)).map(license=>({supplement:s,license})):
-          [{supplement:s,license:baseLicense?.article7?baseLicense:null}]):[{supplement:null,license:baseLicense||null}];
-        for(const {supplement,license} of options){
+        const baseLicense=licenses.find(l=>l.id===(route.licenseId||q.license))||null;
+        const supplements=scenario.haccp
+          ? data.qualifications.supplements.filter(s=>!q.license||!s.licenseIds?.length||s.licenseIds.includes(q.license))
+          : [null];
+
+        for(const supplement of supplements){
           const basis=[route.article,supplement?.article].filter(Boolean).join('；');
           const degreePath=route.kind==='degree'||route.kind==='vocational';
           const majorStatus=degreePath&&q.major?(relevant.length?(relevant.every(x=>x.status==='符合')?'符合':relevant.some(x=>x.status==='需確認')?'需確認':'可能符合'):'需確認'):'';
-          rows.push({id:[industry.id,scenario.id,route.id,education,capital,supplement?.id||'none',license?.id||'none'].join(':'),industry,scenario,route,education,capital,license,supplement,basis,majorStatus,majors:relevant,query:{...q},
+          rows.push({
+            id:[currentIndustry.id,scenario.id,route.id,education,capital,supplement?.id||'none'].join(':'),
+            industry:currentIndustry,scenario,route,education,capital,license:baseLicense,supplement,basis,majorStatus,majors:relevant,query:{...q},
             haccpLabel:data.qualifications.haccpLabels[scenario.haccp?'required':'notRequired'],
             capitalLabel:data.qualifications.capitalOptions.find(c=>c.id===capital).name,
             summary:route.summary+(supplement?'；'+supplement.name:''),
-            qualificationLabel:route.label+(license&&((route.kind==='exam'&&license.examName)||route.kind==='license')?'／'+license.name:'')});
+            qualificationLabel:route.label
+          });
         }
       }
     }
   }
-  return {rows,majors,error:'',unknownIndustry:industries.some(i=>i.id==='unknown')};
+  return {rows,majors,error:'',unknownIndustry:false};
 }
+
 function groupQualifications(data,rows){
   const groups=new Map();
   for(const row of rows){
     const type=data.qualifications.resultGroups.find(g=>g.routeIds.includes(row.route.id));
-    const id=[row.industry.id,row.scenario.id,row.capital,type.id].join(':');
-    if(!groups.has(id)) groups.set(id,{...row,id,type,summary:type.summaries[row.scenario.haccp?'required':'notRequired'],basis:type.basis[row.scenario.haccp?'required':'notRequired'],options:[]});
+    const mergeCapital=row.route.kind!=='vocational'&&row.scenario.capital.length>1;
+    const id=[row.industry.id,row.scenario.id,mergeCapital?'all-capital':row.capital,type.id].join(':');
+    if(!groups.has(id)) groups.set(id,{
+      ...row,id,type,
+      summary:type.summaries[row.scenario.haccp?'required':'notRequired'],
+      basis:type.basis[row.scenario.haccp?'required':'notRequired'],
+      options:[],capitalValues:new Set()
+    });
     const group=groups.get(id);
-    const key=r=>[r.route.id,r.supplement?.id,r.license?.id].join(':');
+    group.capitalValues.add(row.capital);
+    const key=r=>[r.route.id,r.supplement?.id].join(':');
     if(!group.options.some(r=>key(r)===key(row))) group.options.push(row);
   }
-  return [...groups.values()];
+  return [...groups.values()].map(group=>{
+    const values=[...group.capitalValues];
+    const capitalLabel=values.length>1?'不限':data.qualifications.capitalOptions.find(c=>c.id===values[0])?.name||group.capitalLabel;
+    const {capitalValues,...rest}=group;
+    return {...rest,capitalLabel};
+  });
 }
+
 function requiredDocuments(data,row){
   const names=row.majors.filter(m=>m.education==='高職'&&data.majorPolicy.vocationalMajors.includes(m.major)).map(m=>m.major);
   const majors=[...new Set(names.length?names:data.majorPolicy.vocationalMajors)];
@@ -101,5 +136,6 @@ function requiredDocuments(data,row){
   });
   return data.documents.base.map(doc=>({...doc,items:doc.dynamic?proofs:[]}));
 }
-return {normalize,classify,searchMajors,industryMatches,queryQualifications,groupQualifications,requiredDocuments};
+
+return {normalize,classify,searchMajors,industryMatches,resolveIndustry,queryQualifications,groupQualifications,requiredDocuments};
 });
