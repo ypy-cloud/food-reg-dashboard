@@ -211,3 +211,19 @@ td.module-cell{font-weight:800;color:#1d3e5c}
   .qualification-table th:nth-child(7),.qualification-table td:nth-child(7){width:90px}
   .qualification-table th:nth-child(4),.qualification-table td:nth-child(4){width:15%}
 }
+
+/* 2026-09-26 衛生管理人員資格查詢：主條件優先、進階條件收合 */
+.hygiene-primary-query{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.advanced-search{margin-top:12px;border:1px solid var(--border);background:var(--panel-soft,#f7faff)}
+.advanced-search>summary{cursor:pointer;padding:10px 12px;color:var(--blue-dark);font-weight:700;list-style:none}
+.advanced-search>summary::-webkit-details-marker{display:none}
+.advanced-search>summary::before{content:'＋';display:inline-block;width:18px;color:var(--blue)}
+.advanced-search[open]>summary::before{content:'－'}
+.hygiene-advanced-grid{grid-template-columns:repeat(4,minmax(0,1fr));padding:0 12px 12px}
+.active-query{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--orange);background:#fff;margin-bottom:12px;font-size:12px}
+.active-query>strong{color:var(--blue-dark);white-space:nowrap}
+.active-query-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.query-chip{border:1px solid var(--border);background:#f7faff;color:var(--blue-dark);padding:5px 8px;font:inherit;cursor:pointer}
+.query-chip:hover{border-color:var(--blue);background:#eef5ff}
+.clear-all-query{margin-left:auto;white-space:nowrap}
+@media(max-width:1120px){.hygiene-advanced-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
