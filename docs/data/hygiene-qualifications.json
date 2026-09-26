@@ -1,13 +1,14 @@
 {
   "id": "hygiene-qualifications",
   "name": "衛生管理人員資格路徑",
-  "version": "2026-09-26",
-  "lastReviewed": "2026-09-26",
+  "version": "2026-09-27",
+  "lastReviewed": "2026-09-27",
   "effectiveFrom": "2020-07-01",
   "sourceIds": [
     "hm-law",
     "hm-qa",
-    "hm-major-guidance"
+    "hm-major-guidance",
+    "hm-vocational-interpretation-1090019307"
   ],
   "scopeNote": "以須辦理工廠登記之食品製造工廠為前提。",
   "article7Note": "屬食安法第8條第2項公告指定應實施HACCP之食品業者時，衛生管理人員除須符合第4條外，並須符合第7條附加資格。",
