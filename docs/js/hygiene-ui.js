@@ -123,8 +123,8 @@ function showDetail(group,choice={},focus=true){
   const situation=`<dl class="detail-situation"><div><dt>業別</dt><dd>${esc(primary)}</dd></div><div><dt>學歷／資格</dt><dd>${esc(group.type.name)}</dd></div><div><dt>HACCP</dt><dd>${esc(row.haccpLabel)}</dd></div></dl>`;
   const managerRule=row.industry.managerCondition&&!/^具工廠登記即屬/.test(row.industry.managerCondition)
     ?`<section><h3>衛生管理人員設置條件</h3><p>${esc(row.industry.managerCondition)}</p></section>`:'';
-  const haccpRule=row.query.industry
-    ?`<section><h3>HACCP 判定條件</h3>${specific?`<p><strong>產品／製程：</strong>${esc(specific)}</p>`:''}<p>${esc(row.scenario.condition)}</p></section>`:'';
+  const haccpRule=row.query.industry&&row.scenario.haccp
+    ?`<section><h3>HACCP 判定條件</h3>${specific?`<p><strong>相關情境：</strong>${esc(specific)}</p>`:''}<p>${esc(row.scenario.condition)}</p></section>`:'';
   const article5=row.industry.tags.includes('kitchen')
     ?`<div class="tool-caution"><strong>第5條另有資格：</strong>中央廚房食品工廠或餐盒食品工廠，可由領有中餐烹調乙級技術士證並接受衛生講習120小時以上者擔任。${row.scenario.haccp?' 本情境屬應實施HACCP時，仍須依第7條符合第4條及HACCP附加資格。':''}</div>`:'';
 
