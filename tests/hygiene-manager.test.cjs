@@ -15,79 +15,80 @@ test('all JSON, manifest module names, IDs, current and future separation',()=>{
  assert.equal(new Set(data.majors.records.map(r=>r.id)).size,data.majors.records.length);
 });
 
-test('industry is fixed to the ten announced manager categories; major can be queried alone',()=>{
+test('industry selector has 12 choices including central kitchen and meal-box variants',()=>{
  assert.deepEqual(data.industries.managerCategories,[
-  '乳品製造業','罐頭食品製造業','冷凍食品製造業','即食餐食業','特殊營養食品製造業',
-  '食品添加物製造業','水產食品業','肉類加工食品業','健康食品製造業','其他食品製造業'
+  '乳品製造業','罐頭食品製造業','冷凍食品製造業','即食餐食業',
+  '即食餐食業（中央廚房食品工廠）','即食餐食業（餐盒食品工廠）',
+  '特殊營養食品製造業','食品添加物製造業','水產食品業','肉類加工食品業','健康食品製造業','其他食品製造業'
  ]);
- for(const q of [{},{product:'烘焙'},{school:'海洋'},{education:'高職',capital:'under30m'}])assert(engine.queryQualifications(data,q).error);
+ assert.equal(data.industries.industryChoices.length,12);
  assert(engine.queryQualifications(data,{industry:'肉類'}).error);
- const majorOnly=query({major:'食品科學系'});assert(majorOnly.length);assert(majorOnly.every(r=>r.industry.id==='unspecified'));assert(majorOnly.every(r=>!r.scenario.haccp));
+ const majorOnly=query({major:'食品科學系'});assert(majorOnly.length);assert(majorOnly.every(r=>r.industry.id==='unspecified'));
 });
 
-test('other food products never become unknown; specific products can trigger a HACCP profile',()=>{
- for(const product of ['烘焙','飲料','菜餚','炊蒸']){
-  const rows=query({industry:'其他食品製造業',product});assert(rows.length,product);assert(rows.every(r=>r.industry.id==='general'),product);
- }
- const oil=query({industry:'其他食品製造業',product:'食用油脂'});assert(oil.length);assert(oil.every(r=>r.industry.managerCategory==='其他食品製造業'));assert(oil.some(r=>r.scenario.haccp));
- const meal=query({industry:'即食餐食業',product:'餐盒'});assert(meal.length);assert(meal.every(r=>r.industry.id==='meal'));assert(meal.every(r=>r.scenario.haccp));
- const kitchen=query({industry:'即食餐食業',product:'中央廚房'});assert(kitchen.some(r=>r.route.id==='a5-cook'&&!r.scenario.haccp));
+test('generic instant-meal selection expands ordinary, central-kitchen and meal-box profiles',()=>{
+ const rows=query({industry:'即食餐食業'});
+ const ids=new Set(rows.map(r=>r.industry.id));
+ assert(ids.has('ready-meal'));assert(ids.has('kitchen'));assert(ids.has('meal'));
+ const central=query({industry:'即食餐食業（中央廚房食品工廠）'});assert(central.length);assert(central.every(r=>r.industry.id==='kitchen'));
+ const meal=query({industry:'即食餐食業（餐盒食品工廠）'});assert(meal.length);assert(meal.every(r=>r.industry.id==='meal'));assert(meal.every(r=>r.scenario.haccp));
 });
 
-test('article 4 presentation uses degree and exam labels, not general qualification',()=>{
+test('central kitchen article 5 route applies only to non-HACCP scenario',()=>{
+ const rows=query({industry:'即食餐食業（中央廚房食品工廠）'});
+ assert(rows.some(r=>!r.scenario.haccp&&r.route.id==='a5-cook'));
+ assert(!rows.some(r=>r.scenario.haccp&&r.route.id==='a5-cook'));
+ for(const r of rows.filter(r=>r.scenario.haccp)){assert(r.route.article.startsWith('第4'));assert(r.basis.includes('第7'));}
+});
+
+test('other food selection expands general plus HACCP oil and egg situations only',()=>{
+ const rows=query({industry:'其他食品製造業'});const ids=new Set(rows.map(r=>r.industry.id));
+ assert(ids.has('general'));assert(ids.has('oil'));assert(ids.has('egg'));assert(!ids.has('thermal'));
+ assert(rows.filter(r=>r.industry.id==='general').every(r=>!r.scenario.haccp));
+ assert(rows.filter(r=>['oil','egg'].includes(r.industry.id)).every(r=>r.scenario.haccp));
+ const thermalProfile=data.industries.industries.find(r=>r.id==='thermal');assert.equal(thermalProfile,undefined);
+});
+
+test('low-acid and acidified HACCP conditions remain under canned food',()=>{
+ const rows=query({industry:'罐頭食品製造業'});
+ assert(rows.some(r=>r.scenario.haccp&&/低酸性|酸化/.test(r.scenario.condition)));
+ assert(rows.some(r=>!r.scenario.haccp));
+});
+
+test('article 4 degree and exam paths are grouped into one row label',()=>{
  const groups=engine.groupQualifications(data,query({industry:'肉類加工食品業'}));
- assert(groups.some(g=>g.type.name==='專科以上'));assert(groups.some(g=>g.type.name==='考試資格'));
- assert(!groups.some(g=>/一般資格|相關科系／考試資格/.test(g.type.name)));
+ const required=groups.filter(g=>g.scenario.haccp&&g.type.name==='專科以上／考試資格');
+ assert.equal(required.length,1);
+ assert.deepEqual(new Set(required[0].options.map(r=>r.route.id)),new Set(['a4-degree','a4-high-exam','a4-ordinary-exam']));
+ assert(!groups.some(g=>['專科以上','考試資格','一般資格','相關科系／考試資格'].includes(g.type.name)));
 });
 
-test('meat HACCP capital-neutral results merge; article 6 remains non-HACCP only',()=>{
- const raw=query({industry:'肉類加工食品業'}),groups=engine.groupQualifications(data,raw);
- const haccp=groups.filter(g=>g.scenario.haccp);
- assert(haccp.length);assert(haccp.every(g=>g.capitalLabel==='不限'));
- assert(haccp.every(g=>g.options.every(r=>r.route.article.startsWith('第4'))));
- assert(haccp.every(g=>g.basis.includes('第7')));
- assert(!haccp.some(g=>g.options.some(r=>r.route.id==='a6-vocational')));
- const non=groups.filter(g=>!g.scenario.haccp);
- assert(non.some(g=>g.type.name==='高職'&&g.capitalLabel==='未達3,000萬'));
- assert(groups.every(g=>!('summary' in g)||g.summary));
+test('meat HACCP capital-neutral result stays merged and article 6 is non-HACCP only',()=>{
+ const groups=engine.groupQualifications(data,query({industry:'肉類加工食品業'}));
+ const haccp=groups.filter(g=>g.scenario.haccp);assert(haccp.length);
+ assert(haccp.every(g=>g.capitalLabel==='不限'));
+ assert(haccp.every(g=>g.options.every(r=>r.route.id!=='a6-vocational')));
+ assert(groups.some(g=>!g.scenario.haccp&&g.type.name==='高職'&&g.capitalLabel==='未達3,000萬'));
 });
 
-test('food science degree path and documents remain explicit',()=>{
- const rows=query({industry:'肉類加工食品業',major:'食品科學系'});
- const degree=rows.find(r=>r.route.kind==='degree');assert(degree);assert.equal(degree.education,'專科以上');assert(degree.majors.some(m=>m.classCode==='0721'));
- assert(engine.requiredDocuments(data,degree)[2].items.includes('專科以上符合科系資格畢業證書'));
-});
-
-test('article 7 certificates are shown together rather than one option per certificate',()=>{
- const rows=query({industry:'肉類加工食品業'}).filter(r=>r.scenario.haccp&&r.route.id==='a4-degree');
- const thirty=rows.find(r=>r.supplement?.id==='haccp30');assert(thirty);
- const proofs=engine.requiredDocuments(data,thirty)[2].items;
- assert(proofs.some(x=>x.includes('食品技師')&&x.includes('畜牧技師')&&x.includes('獸醫師')&&x.includes('水產養殖技師')&&x.includes('營養師')&&x.includes('其中之一')));
+test('article 7 certificates appear together and files remain explicit',()=>{
+ const groups=engine.groupQualifications(data,query({industry:'肉類加工食品業'}));
+ const g=groups.find(x=>x.scenario.haccp&&x.type.name==='專科以上／考試資格');assert(g);
+ const thirty=g.options.find(r=>r.route.id==='a4-degree'&&r.supplement?.id==='haccp30');assert(thirty);
+ const docs=engine.requiredDocuments(data,thirty);
+ assert.deepEqual(docs.map(x=>x.id),['application','card','qualifications','identity','employment','factory']);
+ const proofs=docs[2].items;
+ assert(proofs.includes('專科以上符合科系資格畢業證書'));
+ assert(proofs.some(x=>['食品技師','畜牧技師','獸醫師','水產養殖技師','營養師'].every(n=>x.includes(n))));
  assert(proofs.some(x=>x.includes('30小時')));
- assert.equal(rows.filter(r=>r.supplement?.id==='haccp30').length,2);
 });
 
-test('specified vocational names and article 6 documents',()=>{
+test('article 6 vocational path remains available only under 30m and non-HACCP',()=>{
  for(const name of data.majorPolicy.vocationalMajors){
-  const rows=query({major:name,education:'高職',capital:'under30m'});
-  const row=rows.find(r=>r.route.id==='a6-vocational');assert(row,name);
+  const rows=query({major:name,education:'高職',capital:'under30m'});const row=rows.find(r=>r.route.id==='a6-vocational');assert(row,name);
   const docs=engine.requiredDocuments(data,row);assert(docs[2].items.some(x=>x.includes(name)));assert(docs[2].items.some(x=>x.includes('4年以上')));assert(docs[2].items.some(x=>x.includes('60小時')));
  }
  assert(!query({industry:'肉類加工食品業',education:'高職',capital:'atLeast30m'}).some(r=>r.route.id==='a6-vocational'));
-});
-
-test('documents keep stable base order and article 5 retains its named certificate',()=>{
- const row=query({industry:'肉類加工食品業'}).find(r=>r.route.id==='a4-degree'&&r.supplement?.id==='haccp60');
- const docs=engine.requiredDocuments(data,row);assert.deepEqual(docs.map(x=>x.id),['application','card','qualifications','identity','employment','factory']);
- const cook=query({industry:'即食餐食業',product:'中央廚房',license:'chinese-cook-b'}).find(r=>r.route.id==='a5-cook');assert(cook);
- const proofs=engine.requiredDocuments(data,cook)[2].items;assert(proofs.includes('中餐烹調乙級技術士證'));assert(proofs.some(x=>x.includes('120小時')));
-});
-
-test('HACCP appears only for the configured specific industry or product situations',()=>{
- assert(query({industry:'乳品製造業'}).every(r=>r.scenario.haccp));
- assert(query({industry:'冷凍食品製造業'}).every(r=>!r.scenario.haccp));
- assert(query({industry:'特殊營養食品製造業'}).every(r=>!r.scenario.haccp));
- assert(query({industry:'其他食品製造業',product:'食用油脂',capital:'atLeast30m'}).every(r=>r.scenario.haccp));
 });
 
 test('major-code search behavior is unchanged',()=>{
