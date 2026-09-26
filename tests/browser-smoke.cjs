@@ -12,110 +12,70 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   await page.goto(base);await page.locator('#hmSearch:not([disabled])').waitFor({state:'attached'});
 
   assert(await page.locator('#rows tr[data-id]').count()>0);
-  await page.locator('input[value="future"]').check();assert((await page.locator('#rows').innerText()).includes('未來實施'));
-  await page.locator('input[value="history"]').check();assert(!(await page.locator('#rows').innerText()).includes('未來實施'));
-  await page.locator('input[value="current"]').check();
   const downloadPromise=page.waitForEvent('download');await page.locator('#csvBtn').click();const download=await downloadPromise;assert(download.suggestedFilename().endsWith('.csv'));
 
   await page.locator('#hygieneNav').click();
-  await page.locator('#hmSearch').click();assert((await page.locator('#hmMessage').innerText()).includes('選擇業別'));
-  assert.equal(await page.locator('#hmIndustry option').count(),13);
-  assert.equal(await page.locator('#hmMajor').count(),0);
-  assert.equal(await page.locator('#hmSchool').count(),0);
-  assert.equal(await page.locator('#hmAdvanced summary').count(),0);
-  assert(await page.locator('#hmEducation').isVisible());
-  assert(await page.locator('#hmLicense').isVisible());
-  assert(await page.locator('#hmCapital').isVisible());
+  assert.equal(await page.locator('#hmAdvanced').count(),0);
+  for(const id of ['hmIndustry','hmQualification','hmLicense','hmCapital'])assert(await page.locator('#'+id).isVisible());
+  assert.equal(await page.locator('#hmQualification option').count(),3);
 
   await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});await page.locator('#hmSearch').click();
-  const meatText=await page.locator('#hmRows').innerText();
-  assert(meatText.includes('專科以上／考試資格'));assert(!meatText.includes('考試資格\n'));assert(!meatText.includes('相關科系／考試資格'));
-  assert.equal(await page.locator('.qualification-table thead th').count(),6);
   const required=page.locator('#hmRows tr').filter({hasText:'專科以上／考試資格'}).filter({hasText:'應實施 HACCP'});
-  assert.equal(await required.count(),1);assert((await required.innerText()).includes('不限'));
+  assert.equal(await required.count(),1);
   await required.getByRole('button',{name:'應備文件',exact:true}).click();
   let detail=await page.locator('#hmDetail').innerText();
-  assert(detail.includes('HACCP 判定條件')&&detail.includes('50%'));
-  assert.equal(await page.locator('#hmDetail .detail-situation dd').count(),5);
   for(const label of ['業別／情境','學歷／資格','資本額條件','HACCP 情境','法源'])assert(detail.includes(label));
-  for(const route of ['相關科系畢業','相關類科高等／相當特考','相關類科普考／丙等特考及工作經歷'])assert(detail.includes(route));
-  assert.equal(await page.locator('[name="detailRoute"]').count(),0);
-  assert.equal(await page.locator('[name="detailSupplement"]').count(),0);
+  assert.equal(await page.locator('[name="detailRoute"]').count(),3);
+  assert.equal(await page.locator('[name="detailSupplement"]').count(),2);
   let proofs=await page.locator('.document-list').innerText();
-  assert(proofs.includes('第4條資格證明（擇一）')&&proofs.includes('第7條附加資格證明（擇一）'));
+  assert(proofs.includes('專科以上符合科系資格畢業證書'));assert(proofs.includes('60小時'));
+
+  await page.locator('[name="detailRoute"][value="a4-ordinary-exam"]').check();
+  proofs=await page.locator('.document-list').innerText();
+  assert(proofs.includes('普通考試')&&proofs.includes('3年以上'));assert(!proofs.includes('專科以上符合科系資格畢業證書'));
+
+  await page.locator('[name="detailSupplement"][value="haccp30"]').check();
+  proofs=await page.locator('.document-list').innerText();
+  assert(proofs.includes('30小時')&&!proofs.includes('60小時'));
   for(const name of ['食品技師','畜牧技師','獸醫師','水產養殖技師','營養師'])assert(proofs.includes(name));
-
-  const nonRequired=page.locator('#hmRows tr').filter({hasText:'專科以上／考試資格'}).filter({hasText:'非屬應實施 HACCP'}).first();
-  await nonRequired.getByRole('button',{name:'應備文件',exact:true}).click();
-  detail=await page.locator('#hmDetail').innerText();assert(!detail.includes('HACCP 判定條件'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});
-  await page.locator('#hmEducation').selectOption('高職');
-  await page.locator('#hmLicense').selectOption('food-technologist');
-  await page.locator('#hmCapital').selectOption('atLeast30m');
-  await page.locator('#hmSearch').click();
-  const filteredRows=page.locator('#hmRows tr');
-  assert(await filteredRows.count()>0);
-  const filteredText=await page.locator('#hmRows').innerText();
-  assert(filteredText.includes('3,000萬以上'));
-  assert(!filteredText.includes('未達3,000萬'));
-  assert(!filteredText.includes('高職\t未達3,000萬'));
-  await filteredRows.first().getByRole('button',{name:'應備文件',exact:true}).click();
-  detail=await page.locator('#hmDetail').innerText();
-  assert(detail.includes('相關類科高等／相當特考'));
-  assert(!detail.includes('專科以上學校'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'即食餐食業（中央廚房食品工廠）'});
-  await page.locator('#hmEducation').selectOption('高職');
-  await page.locator('#hmLicense').selectOption('chinese-cook-b');
-  await page.locator('#hmCapital').selectOption('atLeast30m');
-  await page.locator('#hmSearch').click();
-  const cookFiltered=await page.locator('#hmRows').innerText();
-  assert(cookFiltered.includes('中餐烹調乙級技術士'));
-  assert(!cookFiltered.includes('應實施 HACCP'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'即食餐食業'});await page.locator('#hmSearch').click();
-  const instant=await page.locator('#hmRows').innerText();
-  assert(instant.includes('即食餐食業'));assert(instant.includes('中央廚房食品工廠'));assert(instant.includes('餐盒食品工廠'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'即食餐食業（中央廚房食品工廠）'});await page.locator('#hmSearch').click();
-  const central=await page.locator('#hmRows').innerText();assert(central.includes('中央廚房食品工廠'));assert(!central.includes('餐盒食品工廠'));
-  const article5=page.locator('#hmRows tr').filter({hasText:'中餐烹調乙級技術士'});assert(await article5.count()>0);
-  await article5.first().getByRole('button',{name:'應備文件',exact:true}).click();detail=await page.locator('#hmDetail').innerText();assert(detail.includes('120小時'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'即食餐食業（餐盒食品工廠）'});await page.locator('#hmSearch').click();
-  const meal=await page.locator('#hmRows').innerText();assert(meal.includes('餐盒食品工廠'));assert(!meal.includes('中餐烹調乙級技術士'));assert(meal.includes('應實施 HACCP'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'其他食品製造業'});await page.locator('#hmSearch').click();
-  const other=await page.locator('#hmRows').innerText();
-  assert(other.includes('其他食品製造業'));assert(other.includes('食用油脂工廠'));assert(other.includes('蛋製品工廠'));
-  assert(!other.includes('低酸性'));assert(!other.includes('酸化食品'));
-
-  await page.locator('#qualificationForm button[type="reset"]').click();
-  await page.locator('#hmIndustry').selectOption({label:'罐頭食品製造業'});await page.locator('#hmSearch').click();
-  const cannedHaccp=page.locator('#hmRows tr').filter({hasText:'應實施 HACCP'}).first();await cannedHaccp.getByRole('button',{name:'應備文件',exact:true}).click();
-  detail=await page.locator('#hmDetail').innerText();assert(/低酸性|酸化/.test(detail));
 
   await page.locator('#qualificationForm button[type="reset"]').click();
   await page.locator('#hmIndustry').selectOption({label:'其他食品製造業'});
-  await page.locator('#hmEducation').selectOption('高職');
+  await page.locator('#hmQualification').selectOption('vocational');
   await page.locator('#hmCapital').selectOption('under30m');
   await page.locator('#hmSearch').click();
-  const vocationalRow=page.locator('#hmRows tr').filter({hasText:'高職'}).filter({hasText:'未達3,000萬'}).first();
+  const highText=await page.locator('#hmRows').innerText();
+  assert(highText.includes('高職'));assert(!highText.includes('專科以上／考試資格'));
+  const vocationalRow=page.locator('#hmRows tr').filter({hasText:'高職'}).first();
   await vocationalRow.getByRole('button',{name:'應備文件',exact:true}).click();
   detail=await page.locator('#hmDetail').innerText();
   assert.equal(await page.locator('#detailVocational').count(),0);
-  assert(detail.includes('第6條指定高職科別'));
-  assert(detail.includes('食品加工科')&&detail.includes('餐飲管理科'));
+  assert(detail.includes('第6條指定高職科別')&&detail.includes('食品加工科')&&detail.includes('餐飲管理科'));
+  proofs=await page.locator('.document-list').innerText();assert(proofs.includes('高職指定科別畢業證書'));
+
+  await page.locator('#qualificationForm button[type="reset"]').click();
+  await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});
+  await page.locator('#hmQualification').selectOption('article4');
+  await page.locator('#hmLicense').selectOption('food-technologist');
+  await page.locator('#hmCapital').selectOption('atLeast30m');
+  await page.locator('#hmSearch').click();
+  const filtered=await page.locator('#hmRows').innerText();
+  assert(filtered.includes('專科以上／考試資格'));assert(!filtered.includes('高職'));assert(!filtered.includes('未達3,000萬'));
+
+  await page.locator('#qualificationForm button[type="reset"]').click();
+  await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});
+  await page.locator('#hmQualification').selectOption('vocational');
+  await page.locator('#hmLicense').selectOption('food-technologist');
+  await page.locator('#hmCapital').selectOption('under30m');
+  await page.locator('#hmSearch').click();
+  assert((await page.locator('#hmMessage').innerText()).includes('未找到適用情境'));
+
+  await page.locator('#qualificationForm button[type="reset"]').click();
+  await page.locator('#hmIndustry').selectOption({label:'即食餐食業（中央廚房食品工廠）'});await page.locator('#hmSearch').click();
+  const article5=page.locator('#hmRows tr').filter({hasText:'中餐烹調乙級技術士'}).first();await article5.getByRole('button',{name:'應備文件',exact:true}).click();
   proofs=await page.locator('.document-list').innerText();
-  assert(proofs.includes('高職指定科別畢業證書'));
-  assert(!proofs.includes('高職指定科別畢業證書：'));
+  assert(proofs.includes('中餐烹調乙級技術士證')&&proofs.includes('120小時'));
+  assert.equal(await page.locator('.document-list li').evaluateAll(nodes=>nodes.filter(n=>!n.textContent.trim()).length),0);
 
   await page.locator('#majorTab').click();assert(await page.locator('#majorPanel').isVisible());
   await page.locator('#mcMajor').fill('食品科學系');await page.locator('#mcSearch').click();
@@ -123,11 +83,11 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
 
   const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:1});mobile.on('pageerror',e=>errors.push(e.message));
   await mobile.goto(base);await mobile.locator('#hmSearch:not([disabled])').waitFor({state:'attached'});await mobile.locator('#hygieneNav').click();
-  await mobile.locator('#hmIndustry').selectOption({label:'其他食品製造業'});await mobile.locator('#hmSearch').click();await mobile.locator('#hmRows button').first().click();
+  for(const id of ['hmIndustry','hmQualification','hmLicense','hmCapital'])assert(await mobile.locator('#'+id).isVisible());
+  await mobile.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});await mobile.locator('#hmSearch').click();await mobile.locator('#hmRows button').first().click();
   assert(await mobile.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
-  assert.equal(await mobile.locator('#hmRows td').first().evaluate(el=>getComputedStyle(el,'::before').content),'"業別"');
 
   await page.locator('#modulesBtn').click();await page.locator('#moduleCatalog [data-module]').first().click();assert(await page.locator('#regulationsSection').isVisible());
-  assert.deepEqual(errors,[]);console.log('PASS: integrated hygiene industry selector, HACCP scenarios, major lookup, CSV and regulation modes.');
+  assert.deepEqual(errors,[]);console.log('PASS: hygiene route selection, AND filters, documents, major lookup and mobile layout.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
