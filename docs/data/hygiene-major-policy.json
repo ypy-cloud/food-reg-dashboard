@@ -7,7 +7,8 @@
     "hm-law",
     "hm-major-guidance",
     "moe-bcode",
-    "moe-vocational"
+    "moe-vocational",
+    "hm-vocational-interpretation-1090019307"
   ],
   "classificationVersion": "教育部學科標準分類第5次修正（106年9月）",
   "recognizedClassCodes": [
@@ -74,7 +75,8 @@
     "related": "主要學類列於TFDA相關科系表；若科系名稱未與TFDA列舉名稱對應，請核對實際科系及畢業證書名稱。",
     "unknown": "主要學類未列於TFDA表，或缺少可核對分類；請核對實際科系、畢業年度或個案認定，不能僅據系名排除。",
     "vocational": "科別名稱與第6條指定科別一致；尚須同時符合資本額、4年工作經歷及60小時訓練條件。",
-    "notVocational": "非第6條列舉的指定科別；本狀態僅針對此高職科別路徑，不排除其他考試資格。"
+    "notVocational": "非第6條列舉的指定科別；本狀態僅針對此高職科別路徑，不排除其他考試資格。",
+    "vocationalInterpretation": "科別依FDA 食字第1090019307號函認定得屬第6條第1款高職科別；仍須同時符合資本額、4年工作經歷及60小時訓練條件。"
   },
   "higherEducationLevels": [
     "二專",
@@ -604,5 +606,15 @@
     "職業安全與衛生",
     "職業安全與防災",
     "消防安全"
+  ],
+  "vocationalInterpretations": [
+    {
+      "major": "餐飲技術科",
+      "article": "第6條第1款",
+      "basis": "FDA 食字第1090019307號函",
+      "date": "2020-07-10",
+      "sourceId": "hm-vocational-interpretation-1090019307",
+      "note": "函釋認定「餐飲技術科」得認屬食品製造工廠衛生管理人員設置辦法第6條第1款之高職科別；其餘第6條工作經歷及HACCP訓練條件仍須同時符合。"
+    }
   ]
 }
