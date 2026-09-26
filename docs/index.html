@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260926-hm-simple">
-<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-simple">
+<link rel="stylesheet" href="css/style.css?v=20260926-hm-refine">
+<link rel="stylesheet" href="css/mobile.css?v=20260926-hm-refine">
 </head>
 <body>
 <div class="app-shell">
@@ -46,26 +46,27 @@
         <form class="panel query-panel" id="qualificationForm">
           <h3 class="panel-title">查詢條件</h3>
           <div class="hygiene-primary-query">
-            <label class="field"><span>業別</span><input type="search" id="hmIndustry" list="hmIndustryOptions" autocomplete="off" placeholder="例如：肉類、乳品、餐盒、食用油脂"><datalist id="hmIndustryOptions"></datalist></label>
+            <label class="field"><span>業別</span><select id="hmIndustry"><option value="">請選擇業別</option></select></label>
             <label class="field"><span>科系</span><input type="search" id="hmMajor" list="hmMajorOptions" autocomplete="off" placeholder="大專科系或高職指定科別"><datalist id="hmMajorOptions"></datalist><button class="text-link" type="button" id="majorShortcut">不確定科系資格？查學類代碼</button></label>
           </div>
           <details class="advanced-search" id="hmAdvanced">
             <summary>更多條件 <span id="hmAdvancedCount"></span></summary>
             <div class="query-grid hygiene-advanced-grid">
+              <label class="field"><span>產品／製程</span><input type="search" id="hmProduct" list="hmProductOptions" autocomplete="off" placeholder="例如：食用油脂、蛋製品、餐盒"><datalist id="hmProductOptions"></datalist></label>
               <label class="field"><span>學校名稱</span><input type="search" id="hmSchool" placeholder="協助辨識系所"></label>
               <label class="field"><span>學歷</span><select id="hmEducation"><option value="">全部</option></select></label>
               <label class="field"><span>證照</span><select id="hmLicense"><option value="">全部</option></select></label>
               <label class="field"><span>資本額</span><select id="hmCapital"><option value="">全部</option></select></label>
             </div>
           </details>
-          <p class="tool-note">業別、科系至少填一項。其他條件只在需要縮小結果時再使用；學校名稱只協助辨識系所。</p>
+          <p class="tool-note">業別、科系至少填一項。業別依公告固定選取；產品／製程只用來判斷特定 HACCP 情境。其他條件需要時再展開。</p>
           <div class="query-actions"><button class="btn secondary" type="reset">清除條件</button><button class="btn primary" type="submit" id="hmSearch" disabled>查詢</button></div>
         </form>
         <div class="active-query" id="hmActiveConditions" hidden aria-live="polite"></div>
         <div class="panel results-panel">
           <div class="results-head"><h2>適用情境 <span class="result-count" id="hmCount"></span></h2></div>
           <p class="tool-note result-note" id="hmMessage" role="status" aria-live="polite">請輸入業別或科系開始查詢。</p>
-          <div class="tablewrap"><table class="tool-table qualification-table"><thead><tr><th>業別</th><th>資格路徑</th><th>資本額條件</th><th>HACCP 情境</th><th>主要資格條件</th><th>法源</th><th>操作</th></tr></thead><tbody id="hmRows"></tbody></table></div>
+          <div class="tablewrap"><table class="tool-table qualification-table"><thead><tr><th>業別</th><th>學歷／資格</th><th>資本額條件</th><th>HACCP 情境</th><th>法源</th><th>操作</th></tr></thead><tbody id="hmRows"></tbody></table></div>
           <div class="pagination-bar"><span class="page-info" id="hmPageInfo"></span><div class="pager" id="hmPager" aria-label="資格查詢分頁"></div></div>
         </div>
       </div>
@@ -237,8 +238,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260926-hm-simple" defer></script>
-<script src="js/hygiene-ui.js?v=20260926-hm-simple" defer></script>
+<script src="js/hygiene-manager.js?v=20260926-hm-refine" defer></script>
+<script src="js/hygiene-ui.js?v=20260926-hm-refine" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>
