@@ -157,7 +157,6 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 }
 
 /* Hygiene manager tools share the existing rectangular visual language. */
-[hidden]{display:none!important}
 .regulations-section{display:grid;gap:12px}
 .section-navigation{padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap}
 .hygiene-header{padding:16px;border-top:3px solid var(--blue);margin-bottom:12px}
@@ -165,11 +164,25 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 .tool-tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:12px}
 .tool-tabs .module-tab{font-size:14px;min-height:40px}
 .hygiene-main{display:grid;gap:12px;min-width:0;align-content:start}
-.hygiene-query-grid{align-items:start;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+
+.hygiene-filter-grid{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}
 .major-query-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .tool-note{font-size:12px;color:var(--muted);line-height:1.6;font-weight:400}
 .text-link{border:0;background:none;color:var(--blue);text-align:left;padding:5px 0;font-size:12px;text-decoration:underline;cursor:pointer}
 .result-note{padding:0 15px}
+
+.active-query{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--orange);background:#fff;margin-bottom:12px;font-size:12px}
+.active-query>strong{color:var(--blue-dark);white-space:nowrap}
+.active-query-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.query-chip{border:1px solid var(--border);background:#f7faff;color:var(--blue-dark);padding:5px 8px;font:inherit;cursor:pointer}
+.query-chip:hover{border-color:var(--blue);background:#eef5ff}
+.clear-all-query{margin-left:auto;white-space:nowrap}
+
+.tool-table tbody tr{cursor:default}
+.tool-table .tool-note{margin:5px 0}
+#majorPanel>.query-panel{margin-bottom:12px}
+.document-btn{font-size:12px;min-height:32px;padding:5px 8px;color:var(--blue);white-space:nowrap}
+
 .hygiene-detail{font-size:13px;line-height:1.65;overflow-wrap:anywhere}
 .hygiene-detail section+section{border-top:1px solid var(--border);margin-top:18px;padding-top:12px}
 .hygiene-detail h3{font-size:15px;color:var(--blue-dark);margin:0 0 8px}
@@ -178,94 +191,41 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 .hygiene-detail a{display:inline-block;margin:4px 0}
 .hygiene-detail summary{cursor:pointer;color:var(--blue);font-weight:700}
 .tool-caution{border-left:3px solid var(--orange);background:var(--orange-soft);padding:8px 10px;font-size:12px}
-.document-btn{font-size:12px;min-height:32px;padding:5px 8px;color:var(--blue);white-space:nowrap}
-.tool-table tbody tr{cursor:default}
-#majorPanel>.query-panel{margin-bottom:12px}
-.tool-table .tool-note{margin:5px 0}
-@media(min-width:721px){
-  .tool-table{table-layout:fixed;min-width:840px}
-  .tool-table th,.tool-table td{white-space:normal;word-break:normal;overflow-wrap:anywhere}
-  .qualification-table th:nth-child(1),.qualification-table td:nth-child(1){width:100px}
-  .qualification-table th:nth-child(2),.qualification-table td:nth-child(2){width:130px}
-  .qualification-table th:nth-child(3),.qualification-table td:nth-child(3){width:105px}
-  .qualification-table th:nth-child(4),.qualification-table td:nth-child(4){width:155px}
-  .qualification-table th:nth-child(5),.qualification-table td:nth-child(5){width:155px}
-  .qualification-table th:nth-child(6),.qualification-table td:nth-child(6){width:100px}
-  .qualification-table th:nth-child(7),.qualification-table td:nth-child(7){width:105px}
-  .major-table th,.major-table td{width:auto}
-  .major-table th:nth-child(5),.major-table td:nth-child(5){width:240px}
-  .major-table th:nth-child(8),.major-table td:nth-child(8){width:100px}
-}
-@media(max-width:1120px){.hygiene-query-grid,.major-query-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.detail-situation{margin:0;display:grid;gap:5px}
+.detail-situation>div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;align-items:start}
+.detail-situation dt{color:var(--muted);font-size:12px;font-weight:700}
+.detail-situation dd{margin:0;color:var(--text);font-weight:700}
 
 .qualification-options{border:0;padding:0;margin:0 0 14px;min-width:0}
 .qualification-options legend{font-size:12px;color:var(--muted);padding:0;margin-bottom:5px}
 .qualification-choice{display:flex;align-items:baseline;gap:8px;padding:6px 0;cursor:pointer}
 .qualification-choice input{flex:none;accent-color:var(--blue)}
-.detail-select{margin:10px 0 14px}
-.detail-select select{width:100%;min-width:0}
 .selected-conditions{margin:12px 0}
-@media(min-width:721px){
-  .qualification-table{min-width:0;font-size:13px}
-  .qualification-table th:nth-child(n),.qualification-table td:nth-child(n){width:auto;padding:12px 8px}
-  .qualification-table th:nth-child(7),.qualification-table td:nth-child(7){width:90px}
-  .qualification-table th:nth-child(4),.qualification-table td:nth-child(4){width:15%}
-}
+.qualification-group{margin-top:10px;padding:10px 0;border-top:1px solid var(--border)}
+.qualification-group:first-child{margin-top:0;padding-top:0;border-top:0}
+.qualification-group>strong{display:block;color:var(--blue-dark);margin-bottom:6px}
+.qualification-group ul{margin:6px 0 0 20px;padding:0}
+.vocational-major-list{margin:6px 0 8px;line-height:1.7}
 
-/* 2026-09-26 衛生管理人員資格查詢：主條件優先、進階條件收合 */
-.hygiene-primary-query{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
-.advanced-search{margin-top:12px;border:1px solid var(--border);background:var(--panel-soft,#f7faff)}
-.advanced-search>summary{cursor:pointer;padding:10px 12px;color:var(--blue-dark);font-weight:700;list-style:none}
-.advanced-search>summary::-webkit-details-marker{display:none}
-.advanced-search>summary::before{content:'＋';display:inline-block;width:18px;color:var(--blue)}
-.advanced-search[open]>summary::before{content:'－'}
-.hygiene-advanced-grid{grid-template-columns:repeat(4,minmax(0,1fr));padding:0 12px 12px}
-.active-query{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--orange);background:#fff;margin-bottom:12px;font-size:12px}
-.active-query>strong{color:var(--blue-dark);white-space:nowrap}
-.active-query-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.query-chip{border:1px solid var(--border);background:#f7faff;color:var(--blue-dark);padding:5px 8px;font:inherit;cursor:pointer}
-.query-chip:hover{border-color:var(--blue);background:#eef5ff}
-.clear-all-query{margin-left:auto;white-space:nowrap}
-@media(max-width:1120px){.hygiene-advanced-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-
-/* 2026-09-26 衛生管理人員專區：固定業別、精簡結果與詳細情境 */
-.detail-situation{margin:0;display:grid;gap:5px}
-.detail-situation>div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;align-items:start}
-.detail-situation dt{color:var(--muted);font-size:12px;font-weight:700}
-.detail-situation dd{margin:0;color:var(--text);font-weight:700}
 @media(min-width:721px){
-  .qualification-table{min-width:720px}
-  .qualification-table th:nth-child(n),.qualification-table td:nth-child(n){width:auto}
+  .tool-table{table-layout:fixed;min-width:840px}
+  .tool-table th,.tool-table td{white-space:normal;word-break:normal;overflow-wrap:anywhere}
+  .qualification-table{min-width:720px;font-size:13px}
+  .qualification-table th,.qualification-table td{width:auto;padding:12px 8px}
   .qualification-table th:nth-child(1),.qualification-table td:nth-child(1){width:21%}
   .qualification-table th:nth-child(2),.qualification-table td:nth-child(2){width:19%}
   .qualification-table th:nth-child(3),.qualification-table td:nth-child(3){width:15%}
   .qualification-table th:nth-child(4),.qualification-table td:nth-child(4){width:20%}
   .qualification-table th:nth-child(5),.qualification-table td:nth-child(5){width:15%}
   .qualification-table th:nth-child(6),.qualification-table td:nth-child(6){width:90px}
+  .major-table th,.major-table td{width:auto}
+  .major-table th:nth-child(5),.major-table td:nth-child(5){width:240px}
+  .major-table th:nth-child(8),.major-table td:nth-child(8){width:100px}
 }
-
-/* 2026-09-26 衛生管理人員資格查詢：業別主查詢，進階條件固定展開 */
-.hygiene-primary-query{grid-template-columns:minmax(0,1fr)}
-.advanced-search-open{margin-top:12px}
-.advanced-search-title{padding:10px 12px;color:var(--blue-dark);font-weight:700}
-.hygiene-advanced-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(max-width:1120px){.hygiene-advanced-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-
-/* 2026-09-26 衛生管理人員詳細內容：完整情境、資格路徑與文件替代方案 */
-.qualification-group{margin-top:10px;padding:10px 0;border-top:1px solid var(--border)}
-.qualification-group:first-child{margin-top:0;padding-top:0;border-top:0}
-.qualification-group>strong{display:block;color:var(--blue-dark);margin-bottom:6px}
-.qualification-route-list,.qualification-group ul{margin:6px 0 0 20px;padding:0}
-.qualification-route-list>li{margin-bottom:9px}
-.qualification-route-list ul{margin-top:4px}
-.vocational-major-list{margin:6px 0 8px;line-height:1.7}
-.document-section{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
-.document-section>strong{display:block;color:var(--blue-dark);margin-bottom:5px}
-.document-alternatives{margin:5px 0 0 18px;padding:0}
-.document-alternatives>li{margin-bottom:7px}
-.document-option-label{font-weight:700}
-
-/* 2026-09-26 衛生管理人員資格查詢：四個查詢欄位同層顯示 */
-.hygiene-filter-grid{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}
-@media(max-width:1120px){.hygiene-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.hygiene-filter-grid{grid-template-columns:1fr}}
+@media(max-width:1120px){
+  .hygiene-filter-grid,.major-query-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:720px){
+  .hygiene-filter-grid,.major-query-grid{grid-template-columns:1fr}
+}
