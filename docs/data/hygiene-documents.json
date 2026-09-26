@@ -1,8 +1,8 @@
 {
   "id": "hygiene-documents",
   "name": "衛生管理人員核備文件",
-  "version": "2026-09-26",
-  "lastReviewed": "2026-09-26",
+  "version": "2026-09-27",
+  "lastReviewed": "2026-09-27",
   "sourceIds": [
     "hm-law"
   ],
@@ -36,7 +36,7 @@
   ],
   "proofs": {
     "degree": "專科以上符合科系資格畢業證書",
-    "vocationalDegree": "高職指定科別畢業證書",
+    "vocationalDegree": "高職第6條指定或函釋認定科別畢業證書",
     "highExam": "第4條第1款相關類科高等考試或相當特種考試及格證明",
     "ordinaryExam": "第4條第1款相關類科普通考試或相當丙等特種考試及格證明",
     "work3": "食品或食品添加物製造相關工作3年以上之經歷證明",

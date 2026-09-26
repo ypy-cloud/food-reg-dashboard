@@ -66,7 +66,12 @@ function classify(record,policy){
   let status,reason,article;
   if(record.education==='高職'){
     const match=policy.vocationalMajors.includes(record.major);
-    status=match?'符合':'不符合';reason=policy.statusNotes[match?'vocational':'notVocational'];article=match?'第6條':'第6條（未列入）';
+    const interpretation=(policy.vocationalInterpretations||[]).find(item=>item.major===record.major);
+    const recognized=match||!!interpretation;
+    status=recognized?'符合':'不符合';
+    reason=policy.statusNotes[match?'vocational':interpretation?'vocationalInterpretation':'notVocational'];
+    article=match?'第6條':interpretation?'第6條（函釋認定）':'第6條（未列入）';
+    return {...record,status,reason,article,tfdaListed:false,tfdaDirect:false,tfdaCode:'',vocationalInterpretation:interpretation||null};
   }else{
     const direct=policy.directClassCodes.includes(record.classCode);
     const related=policy.recognizedClassCodes.includes(record.classCode);
