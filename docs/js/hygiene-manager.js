@@ -45,9 +45,9 @@ function resolveIndustries(data,industryName){
 
 function queryQualifications(data,query={}){
   const q=Object.fromEntries(Object.entries(query).map(([k,v])=>[k,String(v??'').trim()]));
-  if(!q.industry&&!q.major) return {error:'請至少選擇業別或輸入科系其中一項。',rows:[],majors:[]};
-  const majors=q.major?searchMajors(data,{major:q.major,school:q.school,education:q.education}):[];
-  const knownEducation=new Set(majors.map(m=>m.education));
+  if(!q.industry) return {error:'請先選擇業別。',rows:[],majors:[]};
+  const majors=[];
+  const knownEducation=new Set();
   const industries=resolveIndustries(data,q.industry);
   if(q.industry&&!industries.length) return {error:'請由業別選單選擇應置衛生管理人員的業別。',rows:[],majors};
   const rows=[];
@@ -61,13 +61,12 @@ function queryQualifications(data,query={}){
     if(route.kind==='degree'||route.kind==='vocational'){
       const education=route.education[0];
       relevant=majors.filter(m=>m.education===education&&m.status!=='不符合');
-      if(q.major&&majors.length&&!relevant.length) continue;
-      if(q.major&&knownEducation.size&&!knownEducation.has(education)) continue;
+
     }
 
     for(const education of route.education){
       if(q.education&&q.education!==education) continue;
-      if(q.major&&!q.education&&knownEducation.size&&!knownEducation.has(education)) continue;
+
 
       for(const capital of route.capital){
         if(!scenario.capital.includes(capital)||(q.capital&&capital!==q.capital)) continue;
@@ -80,7 +79,7 @@ function queryQualifications(data,query={}){
         for(const supplement of supplements){
           const basis=[route.article,supplement?.article].filter(Boolean).join('；');
           const degreePath=route.kind==='degree'||route.kind==='vocational';
-          const majorStatus=degreePath&&q.major?(relevant.length?(relevant.every(x=>x.status==='符合')?'符合':relevant.some(x=>x.status==='需確認')?'需確認':'可能符合'):'需確認'):'';
+          const majorStatus='';
           rows.push({
             id:[currentIndustry.id,scenario.id,route.id,education,capital,supplement?.id||'none'].join(':'),
             industry:currentIndustry,scenario,route,education,capital,license:baseLicense,supplement,basis,majorStatus,majors:relevant,query:{...q},
