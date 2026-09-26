@@ -250,3 +250,17 @@ td.module-cell{font-weight:800;color:#1d3e5c}
 .advanced-search-title{padding:10px 12px;color:var(--blue-dark);font-weight:700}
 .hygiene-advanced-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:1120px){.hygiene-advanced-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* 2026-09-26 衛生管理人員詳細內容：完整情境、資格路徑與文件替代方案 */
+.qualification-group{margin-top:10px;padding:10px 0;border-top:1px solid var(--border)}
+.qualification-group:first-child{margin-top:0;padding-top:0;border-top:0}
+.qualification-group>strong{display:block;color:var(--blue-dark);margin-bottom:6px}
+.qualification-route-list,.qualification-group ul{margin:6px 0 0 20px;padding:0}
+.qualification-route-list>li{margin-bottom:9px}
+.qualification-route-list ul{margin-top:4px}
+.vocational-major-list{margin:6px 0 8px;line-height:1.7}
+.document-section{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.document-section>strong{display:block;color:var(--blue-dark);margin-bottom:5px}
+.document-alternatives{margin:5px 0 0 18px;padding:0}
+.document-alternatives>li{margin-bottom:7px}
+.document-option-label{font-weight:700}
