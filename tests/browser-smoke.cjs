@@ -26,7 +26,10 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   let detail=await page.locator('#hmDetail').innerText();
   for(const label of ['業別／情境','學歷／資格','資本額條件','HACCP 情境','法源'])assert(detail.includes(label));
   assert.equal(await page.locator('[name="detailRoute"]').count(),3);
+  assert((await page.locator('#hmDetail').innerText()).includes('專科以上相關科系畢業'));
   assert.equal(await page.locator('[name="detailSupplement"]').count(),2);
+  const selectedConditions=page.locator('#hmDetail details.selected-conditions');
+  assert.equal(await selectedConditions.count(),1);assert.equal(await selectedConditions.evaluate(el=>el.open),false);
   let proofs=await page.locator('.document-list').innerText();
   assert(proofs.includes('專科以上符合科系資格畢業證書'));assert(proofs.includes('60小時'));
 
@@ -61,6 +64,11 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   await page.locator('#hmSearch').click();
   const filtered=await page.locator('#hmRows').innerText();
   assert(filtered.includes('專科以上／考試資格'));assert(!filtered.includes('高職'));assert(!filtered.includes('未達3,000萬'));
+  const filteredRow=page.locator('#hmRows tr').filter({hasText:'專科以上／考試資格'}).filter({hasText:'應實施 HACCP'}).first();
+  await filteredRow.getByRole('button',{name:'應備文件',exact:true}).click();
+  assert.equal(await page.locator('[name="detailRoute"]').count(),3);
+  assert((await page.locator('#hmDetail').innerText()).includes('專科以上相關科系畢業'));
+  assert.equal(await page.locator('[name="detailSupplement"]').count(),1);
 
   await page.locator('#qualificationForm button[type="reset"]').click();
   await page.locator('#hmIndustry').selectOption({label:'肉類加工食品業'});
