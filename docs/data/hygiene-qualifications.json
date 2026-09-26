@@ -9,7 +9,7 @@
     "hm-qa",
     "hm-major-guidance"
   ],
-  "scopeNote": "以須辦理工廠登記之食品製造工廠為前提。可先輸入業別或科系；業別會依衛生管理人員公告的九個具名業別及「其他食品製造業」整理，HACCP只在特定公告業別與條件下顯示。",
+  "scopeNote": "以須辦理工廠登記之食品製造工廠為前提。業別固定依衛生管理人員公告的九個具名業別及「其他食品製造業」選取；科系可獨立查詢，HACCP只在特定公告業別與條件下顯示。",
   "article7Note": "屬食安法第8條第2項公告指定應實施HACCP之食品業者時，衛生管理人員除須符合第4條外，並須符合第7條附加資格。",
   "educationNote": "考試及證照路徑的學歷欄僅表示查詢情境，法條未另外要求專科以上或高職畢業；仍須符合該項考試資格。",
   "licenses": [
@@ -75,25 +75,45 @@
       "documentIds": [
         "haccp60"
       ],
-      "licenseRequired": false
+      "licenseIds": []
     },
     {
       "id": "haccp30",
-      "name": "指定證書及 HACCP 訓練30小時以上",
+      "name": "食品技師、畜牧技師、獸醫師、水產養殖技師或營養師證書其中之一，並完成 HACCP 訓練30小時以上",
       "article": "第7條第1項第2款",
       "documentIds": [
-        "license",
+        "article7Licenses",
         "haccp30"
       ],
-      "licenseRequired": true
+      "licenseIds": [
+        "food-technologist",
+        "animal-husbandry",
+        "veterinarian",
+        "aquaculture",
+        "dietitian"
+      ]
     }
   ],
   "resultGroups": [
     {
-      "id": "general",
-      "name": "相關科系／考試資格",
+      "id": "degree",
+      "name": "專科以上",
       "routeIds": [
-        "a4-degree",
+        "a4-degree"
+      ],
+      "summaries": {
+        "required": "符合第4條及第7條",
+        "notRequired": "符合第4條"
+      },
+      "basis": {
+        "required": "第4條、第7條",
+        "notRequired": "第4條"
+      }
+    },
+    {
+      "id": "exam",
+      "name": "考試資格",
+      "routeIds": [
         "a4-high-exam",
         "a4-ordinary-exam"
       ],
@@ -108,7 +128,7 @@
     },
     {
       "id": "cook",
-      "name": "中央廚房／餐盒資格",
+      "name": "中餐烹調乙級技術士",
       "routeIds": [
         "a5-cook"
       ],
@@ -121,7 +141,7 @@
     },
     {
       "id": "vocational",
-      "name": "高職資格",
+      "name": "高職",
       "routeIds": [
         "a6-vocational"
       ],
