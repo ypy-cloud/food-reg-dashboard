@@ -152,3 +152,13 @@ test('TFDA listed major name matching distinguishes exact-name evidence from cla
  const review=engine.classify({education:'專科以上',major:'未列名食品創新系',classCode:'0721',className:'食品科學學類'},data.majorPolicy);
  assert.equal(review.tfdaListed,true);assert.equal(review.tfdaMajorMatched,false);
 });
+
+
+test('major-name normalization keeps 學 in 食品科學系',()=>{
+ assert.equal(engine.normalizeMajorName('食品科學系'),'食品科學');
+ assert.equal(engine.normalizeMajorName('食品科技系'),'食品科技');
+ assert.equal(engine.normalizeMajorName('食品科學研究所'),'食品科學');
+ const matched=engine.classify({education:'專科以上',major:'食品科學系',classCode:'0721',className:'食品科學學類'},data.majorPolicy);
+ assert.equal(matched.tfdaMajorMatched,true);
+ assert.equal(matched.tfdaMajorName,'食品科學');
+});

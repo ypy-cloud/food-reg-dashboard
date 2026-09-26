@@ -6,7 +6,7 @@
 'use strict';
 const normalize=value=>String(value??'').normalize('NFKC').toLowerCase().replace(/臺/g,'台').replace(/\s+/g,'').trim();
 const includes=(value,query)=>normalize(value).includes(normalize(query));
-const normalizeMajorName=value=>normalize(value).replace(/(學位學程|研究所|學系|科系|系|所)$/,'');
+const normalizeMajorName=value=>normalize(value).replace(/(學位學程|研究所)$/,'').replace(/系$/,'');
 function tfdaMajorMatch(major,policy){
   const key=normalizeMajorName(major);
   if(!key) return '';
