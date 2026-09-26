@@ -122,8 +122,23 @@ test('article5 document resolves its required license without an explicit licens
  assert(proofs.every(x=>x.trim().length>0));
 });
 
-test('major-code search behavior remains unchanged',()=>{
- const rows=engine.searchMajors(data,{major:'食品科學系',school:'海洋',className:'食品科學',code:'0721'});assert(rows.length);
- for(const r of rows){assert.equal(r.classCode,'0721');assert.equal(r.status,'符合');}
+test('higher-education major lookup excludes vocational records and filters academic levels',()=>{
+ const all=engine.searchMajors(data,{education:'專科以上'});assert(all.length);
+ assert(all.every(r=>r.education==='專科以上'));
+ assert(data.majorPolicy.higherEducationLevels.length===5);
+ for(const level of data.majorPolicy.higherEducationLevels){
+  const rows=engine.searchMajors(data,{education:'專科以上',level});assert(rows.length,level);
+  assert(rows.every(r=>(r.levels||[]).some(v=>v.includes(level))),level);
+ }
+ const vocational=engine.searchMajors(data,{education:'高職'});assert(vocational.length);
+});
+
+test('TFDA listed class metadata is exposed for higher-education results',()=>{
+ const rows=engine.searchMajors(data,{education:'專科以上',major:'食品科學系',className:'食品科學',code:'0721'});assert(rows.length);
+ for(const r of rows){
+  assert.equal(r.classCode,'0721');
+  assert.equal(r.tfdaListed,true);
+  assert.equal(r.tfdaCode,'0721');
+ }
  const vocational=engine.classify({education:'高職',major:'資訊科'},data.majorPolicy);assert.equal(vocational.status,'不符合');
 });
