@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-06",
+  "version": "2026-09-26",
   "lastReviewed": "2026-08-23",
   "modules": [
     {
@@ -51,7 +51,7 @@
   "sources": "data/sources.json",
   "tools": {
     "hygieneManager": {
-      "lastReviewed": "2026-09-06",
+      "lastReviewed": "2026-09-26",
       "files": {
         "qualifications": "data/hygiene-qualifications.json",
         "documents": "data/hygiene-documents.json",
