@@ -92,7 +92,11 @@ function qualificationControlsHtml(group,selection,data){
 
   if(row.route.kind==='vocational'){
     const conditions=row.route.conditions.filter(item=>!item.includes('指定科別畢業'));
-    return `<div class="qualification-group"><strong>第6條指定高職科別</strong><p class="vocational-major-list">${esc(data.majorPolicy.vocationalMajors.join('、'))}</p><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
+    const interpretations=data.majorPolicy.vocationalInterpretations||[];
+    const interpretationHtml=interpretations.length
+      ?`<div class="qualification-group"><strong>函釋認定科別</strong>${interpretations.map(item=>`<p class="vocational-major-list"><span class="status active">函釋認定</span> <strong>${esc(item.major)}</strong><br><span class="tool-note">${esc(item.basis)}；${esc(item.note)}</span></p>`).join('')}</div>`
+      :'';
+    return `<div class="qualification-group"><strong>第6條原列舉高職科別（15科）</strong><p class="vocational-major-list">${esc(data.majorPolicy.vocationalMajors.join('、'))}</p></div>${interpretationHtml}<div class="qualification-group"><strong>其他資格條件</strong><ul>${conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
   }
 
   return `<div class="qualification-group"><strong>${esc(row.route.label)}</strong><ul>${row.route.conditions.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`;
@@ -126,7 +130,7 @@ function showDetail(group,choice={},focus=true){
   const haccpRule=row.query.industry&&row.scenario.haccp
     ?`<section><h3>HACCP 判定條件</h3>${specific?`<p><strong>相關情境：</strong>${esc(specific)}</p>`:''}<p>${esc(row.scenario.condition)}</p></section>`:'';
   const qualificationHtml=qualificationControlsHtml(group,selection,data);
-  const majorSources=row.route.kind==='vocational'?['hm-vocational-guidance','moe-vocational']:[];
+  const majorSources=row.route.kind==='vocational'?['hm-vocational-guidance','hm-vocational-interpretation-1090019307','moe-vocational']:[];
 
   $('#hmDetail').className='hygiene-detail';
   $('#hmDetail').innerHTML=
