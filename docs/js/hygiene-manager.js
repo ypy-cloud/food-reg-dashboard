@@ -27,13 +27,21 @@ function searchMajors(data,query={}){
     (!query.education||r.education===query.education))
     .map(r=>classify(r,data.majorPolicy));
 }
+function industryMatches(industry,query){
+  const values=[industry.name,industry.managerCategory,...(industry.aliases||[])].filter(Boolean);
+  const nq=normalize(query);
+  return values.some(v=>{const nv=normalize(v);return nv.includes(nq)||nq.includes(nv);});
+}
 function queryQualifications(data,query={}){
   const q=Object.fromEntries(Object.entries(query).map(([k,v])=>[k,String(v??'').trim()]));
   if(!q.industry&&!q.major) return {error:'請至少輸入業別或科系其中一項。',rows:[],majors:[]};
   const majors=q.major?searchMajors(data,{major:q.major,school:q.school,education:q.education}):[];
   const knownEducation=new Set(majors.map(m=>m.education));
-  let industries=q.industry?data.industries.industries.filter(i=>[i.name,...i.aliases].some(x=>includes(x,q.industry))):data.industries.industries;
-  if(!industries.length) industries=[{...data.industries.unknown,name:q.industry+'（業別待確認）'}];
+  let industries;
+  if(q.industry){
+    industries=data.industries.industries.filter(i=>industryMatches(i,q.industry));
+    if(!industries.length) industries=[{...data.industries.unknown,name:q.industry+'（待確認）'}];
+  }else industries=[data.industries.unspecified];
   const rows=[];
   for(const industry of industries) for(const scenario of industry.scenarios) for(const route of data.qualifications.routes){
     if(!route.haccp.includes(scenario.haccp)) continue;
@@ -60,7 +68,9 @@ function queryQualifications(data,query={}){
           const basis=[route.article,supplement?.article].filter(Boolean).join('；');
           const degreePath=route.kind==='degree'||route.kind==='vocational';
           const majorStatus=degreePath&&q.major?(relevant.length?(relevant.every(x=>x.status==='符合')?'符合':relevant.some(x=>x.status==='需確認')?'需確認':'可能符合'):'需確認'):'';
-          rows.push({id:[industry.id,scenario.id,route.id,education,capital,supplement?.id||'none',license?.id||'none'].join(':'),industry,scenario,route,education,capital,license,supplement,basis,majorStatus,majors:relevant,query:{...q},haccpLabel:data.qualifications.haccpLabels[scenario.haccp?'required':'notRequired'],capitalLabel:data.qualifications.capitalOptions.find(c=>c.id===capital).name,
+          rows.push({id:[industry.id,scenario.id,route.id,education,capital,supplement?.id||'none',license?.id||'none'].join(':'),industry,scenario,route,education,capital,license,supplement,basis,majorStatus,majors:relevant,query:{...q},
+            haccpLabel:data.qualifications.haccpLabels[scenario.haccp?'required':'notRequired'],
+            capitalLabel:data.qualifications.capitalOptions.find(c=>c.id===capital).name,
             summary:route.summary+(supplement?'；'+supplement.name:''),
             qualificationLabel:route.label+(license&&((route.kind==='exam'&&license.examName)||route.kind==='license')?'／'+license.name:'')});
         }
@@ -69,7 +79,6 @@ function queryQualifications(data,query={}){
   }
   return {rows,majors,error:'',unknownIndustry:industries.some(i=>i.id==='unknown')};
 }
-// Group presentation only; each option retains its original qualification and documents.
 function groupQualifications(data,rows){
   const groups=new Map();
   for(const row of rows){
@@ -77,7 +86,6 @@ function groupQualifications(data,rows){
     const id=[row.industry.id,row.scenario.id,row.capital,type.id].join(':');
     if(!groups.has(id)) groups.set(id,{...row,id,type,summary:type.summaries[row.scenario.haccp?'required':'notRequired'],basis:type.basis[row.scenario.haccp?'required':'notRequired'],options:[]});
     const group=groups.get(id);
-    // Education scenarios do not create a second copy of the same exam route.
     const key=r=>[r.route.id,r.supplement?.id,r.license?.id].join(':');
     if(!group.options.some(r=>key(r)===key(row))) group.options.push(row);
   }
@@ -93,5 +101,5 @@ function requiredDocuments(data,row){
   });
   return data.documents.base.map(doc=>({...doc,items:doc.dynamic?proofs:[]}));
 }
-return {normalize,classify,searchMajors,queryQualifications,groupQualifications,requiredDocuments};
+return {normalize,classify,searchMajors,industryMatches,queryQualifications,groupQualifications,requiredDocuments};
 });
