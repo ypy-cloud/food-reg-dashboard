@@ -90,8 +90,21 @@ const {chromium}=require('playwright');const fs=require('node:fs');const path=re
   assert.equal(await page.locator('.document-list li').evaluateAll(nodes=>nodes.filter(n=>!n.textContent.trim()).length),0);
 
   await page.locator('#majorTab').click();assert(await page.locator('#majorPanel').isVisible());
-  await page.locator('#mcMajor').fill('食品科學系');await page.locator('#mcSearch').click();
-  assert((await page.locator('#mcRows').innerText()).includes('食品科學系'));
+  assert((await page.locator('#majorTab').innerText()).includes('專科以上科系／學類代碼查詢'));
+  assert.equal(await page.locator('#mcLevel option').count(),6);
+  assert.equal(await page.locator('.major-table thead th').count(),7);
+  const majorHead=await page.locator('.major-table thead').innerText();
+  assert(majorHead.includes('TFDA列舉學類'));assert(!majorHead.includes('對應資格條文'));
+  await page.locator('#mcMajor').fill('食品科技科');
+  await page.locator('#mcSchool').fill('臺東專科');
+  await page.locator('#mcLevel').selectOption('五專');
+  await page.locator('#mcCode').fill('0721');
+  await page.locator('#mcSearch').click();
+  const majorText=await page.locator('#mcRows').innerText();
+  assert(majorText.includes('食品科技科'));assert(majorText.includes('五專'));
+  assert(!majorText.includes('專科以上'));assert(!majorText.includes('高職'));
+  assert(majorText.includes('對應代碼：0721'));
+  assert(majorText.includes('教育部校系')&&majorText.includes('教育部學類')&&majorText.includes('TFDA'));
 
   const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:1});mobile.on('pageerror',e=>errors.push(e.message));
   await mobile.goto(base);await mobile.locator('#hmSearch:not([disabled])').waitFor({state:'attached'});await mobile.locator('#hygieneNav').click();
