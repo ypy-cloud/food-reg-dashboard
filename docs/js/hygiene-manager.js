@@ -120,7 +120,7 @@ function groupQualifications(data,rows){
 }
 
 function proofItemsForRow(data,row,{includeSupplement=true}={}){
-  const ids=[...row.route.documentIds,...(includeSupplement?(row.supplement?.documentIds||[]):[]];
+  const ids=[...row.route.documentIds,...(includeSupplement?(row.supplement?.documentIds||[]):[])];
   return [...new Set(ids)].map(id=>{
     if(id==='highExam'&&row.license?.examName) return row.license.examName+'（或'+row.license.name+'）';
     return data.documents.proofs[id].replace('{majors}',data.majorPolicy.vocationalMajors.join('、')).replace('{license}',row.license?.name||'');
