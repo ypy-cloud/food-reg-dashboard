@@ -176,10 +176,10 @@ function compactMajorSources(){
 function tfdaClassHtml(r){
   const classLabel=[r.tfdaCode||r.classCode,r.className].filter(Boolean).join(' ');
   if(r.tfdaMajorMatched){
-    return `<span class="status verified">TFDA資料有列舉</span><strong class="tfda-major-name">${esc(r.tfdaMajorName)}</strong><span class="tool-note">TFDA列舉學類：${esc(classLabel)}</span>`;
+    return `<span class="status verified">TFDA資料有列舉</span><strong class="tfda-major-name">${esc(r.tfdaMajorName)}</strong><span class="tool-note">${esc(classLabel)}</span>`;
   }
   if(r.tfdaListed){
-    return `<span class="status review">需核對實際科系</span><strong class="tfda-major-name review-text">未找到完全相同科系名稱</strong><span class="tool-note">TFDA列舉學類：${esc(classLabel)}</span>`;
+    return `<span class="status review">需核對實際科系</span><strong class="tfda-major-name review-text">未找到完全相同科系名稱</strong><span class="tool-note">${esc(classLabel)}</span>`;
   }
   return `<span class="status unconfirmed">請核對實際科系</span><span class="tool-note">${esc(r.reason)}</span>`;
 }
