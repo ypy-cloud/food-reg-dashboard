@@ -88,7 +88,7 @@
         }
       ],
       "tags": [],
-      "note": "「罐頭食品製造業」本身是衛生管理人員具名業別；是否應實施HACCP仍要看產品及規模。"
+      "note": "低酸性罐頭食品及酸化罐頭食品之 HACCP 情境歸在罐頭食品製造業判讀。"
     },
     {
       "id": "frozen",
@@ -141,7 +141,7 @@
         }
       ],
       "tags": [],
-      "note": "餐盒食品工廠另有HACCP及第5條資格規定，請用更具體關鍵字查詢。"
+      "note": "選擇「即食餐食業」時，系統同時列出一般即食餐食、中央廚房食品工廠及餐盒食品工廠情境。"
     },
     {
       "id": "special-nutrition",
@@ -393,14 +393,6 @@
           "capital": [
             "under30m"
           ]
-        },
-        {
-          "id": "small-out",
-          "haccp": false,
-          "condition": "資本額未達3,000萬元且食品從業人員未達5人；此情境同時未達其他食品製造業應置衛生管理人員的5人門檻。",
-          "capital": [
-            "under30m"
-          ]
         }
       ],
       "tags": [],
@@ -438,56 +430,6 @@
           "capital": [
             "under30m"
           ]
-        },
-        {
-          "id": "small-out",
-          "haccp": false,
-          "condition": "資本額未達3,000萬元且食品從業人員未達5人；此情境同時未達其他食品製造業應置衛生管理人員的5人門檻。",
-          "capital": [
-            "under30m"
-          ]
-        }
-      ],
-      "tags": [],
-      "note": ""
-    },
-    {
-      "id": "thermal",
-      "name": "熱殺菌密閉容器包裝低酸性食品及酸化食品工廠",
-      "managerCategory": "其他食品製造業",
-      "aliases": [
-        "熱殺菌",
-        "低酸性",
-        "酸化食品"
-      ],
-      "sourceIds": [
-        "haccp-thermal"
-      ],
-      "managerCondition": "如不屬罐頭食品製造業之分類，則歸類「其他食品製造業」並依其規模判定是否應置。",
-      "scenarios": [
-        {
-          "id": "large",
-          "haccp": true,
-          "condition": "產品屬公告範圍且資本額3,000萬元以上。",
-          "capital": [
-            "atLeast30m"
-          ]
-        },
-        {
-          "id": "small-in",
-          "haccp": true,
-          "condition": "產品屬公告範圍，資本額未達3,000萬元且食品從業人員5人以上。",
-          "capital": [
-            "under30m"
-          ]
-        },
-        {
-          "id": "small-out",
-          "haccp": false,
-          "condition": "資本額未達3,000萬元且食品從業人員未達5人；如屬其他食品製造業，此情境亦未達應置衛生管理人員規模。",
-          "capital": [
-            "under30m"
-          ]
         }
       ],
       "tags": [],
@@ -517,7 +459,7 @@
         {
           "id": "base",
           "haccp": false,
-          "condition": "查詢關鍵字未落入目前已建置的HACCP特定業別；如實際產品另符合HACCP公告，應改以該特定產品／業別查詢。",
+          "condition": "未屬目前已建置之 HACCP 特定業別情境。",
           "capital": [
             "under30m",
             "atLeast30m"
@@ -578,6 +520,8 @@
     "罐頭食品製造業",
     "冷凍食品製造業",
     "即食餐食業",
+    "即食餐食業（中央廚房食品工廠）",
+    "即食餐食業（餐盒食品工廠）",
     "特殊營養食品製造業",
     "食品添加物製造業",
     "水產食品業",
@@ -585,22 +529,82 @@
     "健康食品製造業",
     "其他食品製造業"
   ],
-  "productSuggestions": {
-    "即食餐食業": [
-      "餐盒",
-      "盒餐",
-      "團膳",
-      "中央廚房"
-    ],
-    "其他食品製造業": [
-      "食用油脂",
-      "蛋製品",
-      "熱殺菌密閉容器包裝低酸性食品",
-      "酸化食品",
-      "烘焙",
-      "飲料",
-      "菜餚",
-      "炊蒸"
-    ]
-  }
+  "industryChoices": [
+    {
+      "value": "乳品製造業",
+      "profileIds": [
+        "dairy"
+      ]
+    },
+    {
+      "value": "罐頭食品製造業",
+      "profileIds": [
+        "canned"
+      ]
+    },
+    {
+      "value": "冷凍食品製造業",
+      "profileIds": [
+        "frozen"
+      ]
+    },
+    {
+      "value": "即食餐食業",
+      "profileIds": [
+        "ready-meal",
+        "kitchen",
+        "meal"
+      ]
+    },
+    {
+      "value": "即食餐食業（中央廚房食品工廠）",
+      "profileIds": [
+        "kitchen"
+      ]
+    },
+    {
+      "value": "即食餐食業（餐盒食品工廠）",
+      "profileIds": [
+        "meal"
+      ]
+    },
+    {
+      "value": "特殊營養食品製造業",
+      "profileIds": [
+        "special-nutrition"
+      ]
+    },
+    {
+      "value": "食品添加物製造業",
+      "profileIds": [
+        "additive"
+      ]
+    },
+    {
+      "value": "水產食品業",
+      "profileIds": [
+        "fish"
+      ]
+    },
+    {
+      "value": "肉類加工食品業",
+      "profileIds": [
+        "meat"
+      ]
+    },
+    {
+      "value": "健康食品製造業",
+      "profileIds": [
+        "health"
+      ]
+    },
+    {
+      "value": "其他食品製造業",
+      "profileIds": [
+        "general",
+        "oil",
+        "egg"
+      ]
+    }
+  ]
 }
