@@ -7,8 +7,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>食品法規適用性查詢</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/style.css?v=20260927-hygiene-meta">
-<link rel="stylesheet" href="css/mobile.css?v=20260927-hygiene-meta">
+<link rel="stylesheet" href="css/style.css?v=20260927-tfda-links">
+<link rel="stylesheet" href="css/mobile.css?v=20260927-tfda-links">
 </head>
 <body>
 <div class="app-shell">
@@ -18,6 +18,7 @@
     <div class="reviewed">最後更新日期：<span id="lastUpdated">載入中</span></div>
   </div>
   <nav class="top-actions" aria-label="輔助功能">
+    <button type="button" class="top-link" id="tfdaLinksBtn">TFDA網站整合查詢</button>
     <button type="button" class="top-link" id="sourcesBtn">資料來源</button>
     <button type="button" class="top-link" id="modulesBtn">已納入法規</button>
     <button type="button" class="top-link" id="helpBtn">操作說明</button>
@@ -190,6 +191,31 @@
 </footer>
 </div>
 
+<div class="drawer-modal" id="tfdaLinksModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-tfda-links></div>
+  <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="tfdaLinksModalTitle">
+    <div class="modal-head">
+      <div><div class="modal-kicker">食藥署官方網站</div><h2 id="tfdaLinksModalTitle">TFDA網站整合查詢</h2></div>
+      <button class="btn secondary" type="button" id="tfdaLinksCloseBtn">關閉</button>
+    </div>
+    <p class="modal-note">依查詢需求前往食藥署官方網站；連結將於新分頁開啟。</p>
+    <div class="sources tfda-link-list">
+      <div class="source tfda-link-item">
+        <a href="https://consumer.fda.gov.tw/Pages/List.aspx?nodeID=147&amp;rand=1588393373" target="_blank" rel="noopener">TFDA整合查詢服務 ↗</a>
+        <div class="source-desc">食品、業者及相關資料的官方整合查詢入口。</div>
+      </div>
+      <div class="source tfda-link-item">
+        <a href="https://foodlabel.fda.gov.tw/FdaFrontEndApp/" target="_blank" rel="noopener">食品標示諮詢服務平台 ↗</a>
+        <div class="source-desc">查詢食品標示規定、常見問題及標示相關資訊。</div>
+      </div>
+      <div class="source tfda-link-item">
+        <a href="https://fsas.fda.gov.tw/" target="_blank" rel="noopener">食品相關法規暨解釋彙編查詢 ↗</a>
+        <div class="source-desc">查詢食品相關法規、行政解釋與函釋資料。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="drawer-modal" id="modulesModal" aria-hidden="true">
   <div class="modal-backdrop" data-close-modules></div>
   <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="modulesModalTitle">
@@ -230,8 +256,8 @@
   </div>
 </div>
 
-<script src="js/hygiene-manager.js?v=20260927-hygiene-meta" defer></script>
-<script src="js/hygiene-ui.js?v=20260927-hygiene-meta" defer></script>
+<script src="js/hygiene-manager.js?v=20260927-tfda-links" defer></script>
+<script src="js/hygiene-ui.js?v=20260927-tfda-links" defer></script>
 <script src="js/app.js?v=20260906-dates" defer></script>
 </body>
 </html>

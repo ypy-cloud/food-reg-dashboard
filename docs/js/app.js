@@ -230,6 +230,13 @@ function closeModal(modal){
   if(!document.querySelector('.drawer-modal.open')) document.body.style.overflow = '';
 }
 
+function setupTfdaLinks(){
+  const modal = $('#tfdaLinksModal');
+  $('#tfdaLinksBtn').addEventListener('click', () => openModal(modal));
+  $('#tfdaLinksCloseBtn').addEventListener('click', () => closeModal(modal));
+  modal.querySelectorAll('[data-close-tfda-links]').forEach(el => el.addEventListener('click', () => closeModal(modal)));
+}
+
 function setupSources(){
   $('#sources').innerHTML = SOURCES.map(s => `<div class="source"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a><div class="source-desc">${esc(s.desc)}</div></div>`).join('');
   const modal = $('#sourceModal');
@@ -294,6 +301,7 @@ async function init(){
   try{
     await loadData();
     populateControls();
+    setupTfdaLinks();
     setupSources();
     setupModules();
     setupHelp();
